@@ -1,0 +1,12 @@
+@startuml contexto
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Diagrama de Contexto: Sistema de Recria e Terminação
+
+Person(pecuarista, "Pecuarista / Gestor", "Gerencia a fazenda, lança despesas operacionais e acompanha o ganho de peso.")
+System(sistema_agro, "Sistema de Recria e Terminação", "Software que calcula os custos de engorda e o ponto de equilíbrio para venda.")
+System_Ext(frigorifico, "Frigorífico / Mercado", "Baliza a cotação da arroba do boi gordo para comparação de lucros.")
+
+Rel(pecuarista, sistema_agro, "Lança dados do lote e consulta relatórios")
+Rel(sistema_agro, frigorifico, "Compara os custos internos com o preço de mercado")
+@enduml
