@@ -1,0 +1,24 @@
+@startuml fluxo_custo_arroba
+title Fluxograma: Cálculo de Custo por Arroba (@) Ganha
+
+start
+:Analista acessa o painel de custos;
+:Sistema busca o **Custo Total do Lote**;
+:Sistema busca o **Total de @ Ganhas no Período**;
+:Calcula a fórmula: \n**Custo por @ = Custo Total / Total de @**;
+
+if (Qual é a fase do lote?) then (Recria)
+  :Registra e exibe Custo da Recria;
+else (Terminação)
+  :Registra e exibe Custo da Terminação;
+endif
+
+:Monta Painel Comparativo (Recria vs Terminação);
+
+if (Custo por @ está abaixo do valor de mercado?) then (Sim)
+  #Palegreen:Exibe Alerta Verde: Lote Lucrativo;
+else (Não)
+  #Pink:Exibe Alerta Vermelho: Risco de Prejuízo;
+endif
+stop
+@enduml
