@@ -25,3 +25,4 @@ entity "Pesagem" as pesagem {
 lote ||--o{ despesa : "possui"
 lote ||--o{ pesagem : "registra"
 @enduml
+
