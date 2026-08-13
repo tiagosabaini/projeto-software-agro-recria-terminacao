@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Financeiro - Custo por Arroba</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .alerta-verde { background-color: #ccffcc; color: darkgreen; padding: 15px; border: 1px solid darkgreen; margin-top: 10px; font-weight: bold; border-radius: 5px; }
+        .alerta-vermelho { background-color: #ffcccc; color: darkred; padding: 15px; border: 1px solid darkred; margin-top: 10px; font-weight: bold; border-radius: 5px; }
+        .painel-comparativo { display: flex; gap: 20px; margin-top: 20px; }
+        .card { border: 1px solid #ccc; padding: 15px; border-radius: 5px; width: 50%; background-color: #f9f9f9;}
+    </style>
+</head>
+<body>
+    <h2>Painel de Viabilidade: Custo por Arroba (@)</h2>
+    
+    {% if custo_arroba %}
+        <h3>Resultado Final do Lote</h3>
+        <p><strong>Custo Médio por Arroba:</strong> R$ {{ "%.2f"|format(custo_arroba) }}</p>
+
+        <!-- Alerta de Lucratividade injetado pelo Flask -->
+        {% if lucro %}
+            <div class="alerta-verde">✔ A cotação atual cobre os custos. Lote com projeção de lucro!</div>
+        {% else %}
+            <div class="alerta-vermelho">⚠ ALERTA: Custo de produção supera o preço mínimo de venda recomendado. Prejuízo!</div>
+        {% endif %}
+
+        <div class="painel-comparativo">
+            <div class="card">
+                <h4>Fase: Recria</h4>
+                <p>Custo por @: R$ {{ "%.2f"|format(custo_recria) }}</p>
+            </div>
+            <div class="card">
+                <h4>Fase: Terminação</h4>
+                <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao) }}</p>
+            </div>
+        </div>
+    {% else %}
+        <p>Aguardando dados de processamento...</p>
+    {% endif %}
+</body>
+</html>
