@@ -1,48 +1,54 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Despesas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Sistema de Gestão de Lotes</h1>
-        <nav>
-            <a href="{{ url_for('index') }}">Início</a>
-            <a href="{{ url_for('cadastro') }}">Cadastrar Lote</a>
-            <a href="{{ url_for('despesas') }}">Lançar Despesas</a>
-            <a href="{{ url_for('painel') }}">Painel Financeiro</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <div class="container">
-        <h2>Lançamento de Despesas</h2>
+{% block titulo %}Despesas{% endblock %}
 
-        <div class="form-group">
-            <label for="categoria">Categoria: </label>
-            <select name="categoria" id="categoria">
-                <option value="racao">Ração</option>
-                <option value="sal">Sal Mineral</option>
-                <option value="vacina">Vacinas e Medicamentos</option>
-                <option value="agua">Água/Manejo</option>
-            </select>
-        </div>
+{% block conteudo %}
+<h2>Registro de Despesas</h2>
 
-        <div class="form-group" style="margin-top: 15px;">
-            <label for="valor">Valor em Reais (R$):</label>
-            <input type="number" id="valor" step="0.01" min="0" placeholder="0.00">
-        </div>
-
-        <button id="salvar" style="margin-top: 15px;">Salvar Despesa</button>
-
-        <hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
-
-        <h3>Despesas Lançadas</h3>
-        <div id="despesas"></div>
+<form action="{{ url_for('despesas') }}" method="POST" class="form-caixa form-linha">
+    <div class="campo">
+        <label for="categoria">Categoria</label>
+        <select name="categoria" id="categoria">
+            <option value="Ração">Ração</option>
+            <option value="Sal">Sal</option>
+            <option value="Água">Água</option>
+        </select>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+    <div class="campo">
+        <label for="valor">Valor (R$)</label>
+        <input type="number" name="valor" id="valor" step="0.01" min="0" required>
+    </div>
+
+    <button type="submit">Salvar</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Categoria</th>
+            <th>Valor (R$)</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for despesa in despesas %}
+        <tr>
+            <td>{{ despesa.categoria }}</td>
+            <td>{{ "%.2f"|format(despesa.valor) }}</td>
+            <td>
+                <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST">
+                    <button type="submit" class="excluir">Excluir</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">Nenhuma despesa registrada ainda.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+{% endblock %}

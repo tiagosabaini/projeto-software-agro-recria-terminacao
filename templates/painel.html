@@ -1,49 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Painel Financeiro - Custo por Arroba</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <header>
-        <h1>Sistema de Gestão de Lotes</h1>
-        <nav>
-            <a href="{{ url_for('index') }}">Início</a>
-            <a href="{{ url_for('cadastro') }}">Cadastrar Lote</a>
-            <a href="{{ url_for('despesas') }}">Lançar Despesas</a>
-            <a href="{{ url_for('painel') }}">Painel Financeiro</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <div class="container">
-        <h2>Painel de Viabilidade: Custo por Arroba (@)</h2>
-        
-        {% if custo_arroba %}
-            <h3>Resultado Final do Lote</h3>
-            <p><strong>Custo Médio por Arroba:</strong> R$ {{ "%.2f"|format(custo_arroba) }}</p>
+{% block titulo %}Painel Financeiro{% endblock %}
 
-            {% if lucro %}
-                <div class="alerta-verde">✔ A cotação atual cobre os custos. Lote com projeção de lucro!</div>
-            {% else %}
-                <div class="alerta-vermelho">⚠ ALERTA: Custo de produção supera o preço mínimo de venda recomendado. Prejuízo!</div>
-            {% endif %}
+{% block conteudo %}
+<h2>Painel de Viabilidade: Custo por Arroba (@)</h2>
 
-            <div class="painel-comparativo">
-                <div class="card">
-                    <h4>Fase: Recria</h4>
-                    <p>Custo por @: R$ {{ "%.2f"|format(custo_recria) }}</p>
-                </div>
-                <div class="card">
-                    <h4>Fase: Terminação</h4>
-                    <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao) }}</p>
-                </div>
-            </div>
-        {% else %}
-            <p>Aguardando dados de processamento...</p>
-        {% endif %}
+{% if custo_arroba %}
+    <h3>Resultado Final do Lote</h3>
+    <p><strong>Custo Médio por Arroba:</strong> R$ {{ "%.2f"|format(custo_arroba) }}</p>
+
+    {% if lucro %}
+        <div class="alerta-verde">✔ A cotação atual cobre os custos. Lote com projeção de lucro!</div>
+    {% else %}
+        <div class="alerta-vermelho">⚠ ALERTA: Custo de produção supera o preço mínimo de venda recomendado. Prejuízo!</div>
+    {% endif %}
+
+    <div class="painel-comparativo">
+        <div class="card">
+            <h4>Fase: Recria</h4>
+            <p>Custo por @: R$ {{ "%.2f"|format(custo_recria) }}</p>
+        </div>
+        <div class="card">
+            <h4>Fase: Terminação</h4>
+            <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao) }}</p>
+        </div>
     </div>
+{% else %}
+    <p>Aguardando dados de processamento...</p>
+{% endif %}
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+{% endblock %}

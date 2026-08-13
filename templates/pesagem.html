@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block titulo %}Pesagem{% endblock %}
+
+{% block conteudo %}
+<h2>Controle de Pesagem</h2>
+
+<form action="{{ url_for('pesagem') }}" method="POST" class="form-caixa form-linha">
+    <div class="campo">
+        <label for="peso">Peso (kg)</label>
+        <input type="number" name="peso" id="peso" step="0.01" min="0" required>
+    </div>
+
+    <div class="campo">
+        <label for="data">Data</label>
+        <input type="date" name="data" id="data" required>
+    </div>
+
+    <button type="submit">Registrar Pesagem</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Peso (kg)</th>
+            <th>GMD desde a última (kg/dia)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in pesagens %}
+        <tr>
+            <td>{{ p.data }}</td>
+            <td>{{ "%.2f"|format(p.peso) }}</td>
+            <td>
+                {% if p.gmd is not none %}
+                    {{ "%.3f"|format(p.gmd) }}
+                    {% if p.gmd >= 0.8 %}✔{% else %}⚠{% endif %}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">Nenhuma pesagem registrada ainda.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+{% endblock %}
