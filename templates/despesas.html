@@ -4,24 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Despesas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
-    <label for="categoria">Categoria: </label>
+    <header>
+        <h1>Sistema de Gestão de Lotes</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Início</a>
+            <a href="{{ url_for('cadastro') }}">Cadastrar Lote</a>
+            <a href="{{ url_for('despesas') }}">Lançar Despesas</a>
+            <a href="{{ url_for('painel') }}">Painel Financeiro</a>
+        </nav>
+    </header>
 
-    <select name="categoria" id="categoria">
-        <option value="racao">Ração</option>
-        <option value="sal">Sal</option>
-        <option value="agua">Água</option>
-    </select>
+    <div class="container">
+        <h2>Lançamento de Despesas</h2>
 
-    <input type="number" id="valor" step="0.01" min="0">
-    <span>valor em reais</span>
+        <div class="form-group">
+            <label for="categoria">Categoria: </label>
+            <select name="categoria" id="categoria">
+                <option value="racao">Ração</option>
+                <option value="sal">Sal Mineral</option>
+                <option value="vacina">Vacinas e Medicamentos</option>
+                <option value="agua">Água/Manejo</option>
+            </select>
+        </div>
 
-    <button id="salvar">Salvar</button>
+        <div class="form-group" style="margin-top: 15px;">
+            <label for="valor">Valor em Reais (R$):</label>
+            <input type="number" id="valor" step="0.01" min="0" placeholder="0.00">
+        </div>
 
-    <div id="despesas"></div>
+        <button id="salvar" style="margin-top: 15px;">Salvar Despesa</button>
 
-    <script src="../script.js"></script>
+        <hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h3>Despesas Lançadas</h3>
+        <div id="despesas"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
