@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despesas</title>
+</head>
+
+<body>
+    <label for="categoria">Categoria: </label>
+
+    <select name="categoria" id="categoria">
+        <option value="racao">Ração</option>
+        <option value="sal">Sal</option>
+        <option value="agua">Água</option>
+    </select>
+
+    <input type="number" id="valor" step="0.01" min="0">
+    <span>valor em reais</span>
+
+    <button id="salvar">Salvar</button>
+
+    <div id="despesas"></div>
+
+    <script src="../script.js"></script>
+</body>
+</html>
