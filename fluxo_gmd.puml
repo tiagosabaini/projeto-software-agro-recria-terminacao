@@ -1,0 +1,19 @@
+@startuml fluxo_gmd
+title Fluxograma: Cálculo de Ganho Médio Diário (GMD)
+
+start
+:Usuário registra a **Nova Pesagem** do Lote;
+:Sistema busca o **Peso Anterior** e a **Data da Última Pesagem**;
+:Calcula **Dias Decorridos** (Data Atual - Data Anterior);
+:Calcula **Ganho de Peso no Período** (Peso Atual - Peso Anterior);
+:Calcula a fórmula: \n**GMD = Ganho de Peso / Dias Decorridos**;
+
+if (O GMD atingiu a meta da fase?) then (Sim)
+#Palegreen:Status Verde: Desempenho Zootécnico Excelente;
+else (Não)
+#Pink:Status Vermelho: Alerta - Revisar Nutrição e Sanidade;
+endif
+stop
+@enduml
+
+
