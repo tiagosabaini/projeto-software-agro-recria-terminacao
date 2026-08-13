@@ -6,9 +6,9 @@ O projeto consiste em um sistema de software voltado ao agronegócio, especifica
 ##  Integrantes do Grupo e Arquitetura do Sistema (Milestone 2)
 Nesta etapa de engenharia de software, mapeamos a estrutura técnica do projeto antes do desenvolvimento do código. Abaixo está a divisão das responsabilidades e o que cada integrante fez:
 
-* **Tiago Sabaini** (GitHub: @tiagosabaini) e **Jhenifer Alves** (GitHub: @jheniiiialvesss)
-   **O que fizeram:** Fluxograma de Processo do Agro
-   **Descrição:** Desenvolveram os diagramas que mapeiam a lógica de negócio do campo que o software vai resolver. Tiago estruturou o passo a passo matemático do cálculo de custos financeiros por arroba em lote, enquanto Jhenifer focou no processo zootécnico de Ganho Médio Diário (GMD).
+* **Tiago Sabaini** (GitHub: @tiagosabaini)
+   **O que eu fiz:** Fluxograma de Processo do Agro
+   **Descrição:** Desenvolvi os diagramas que mapeiam a lógica de negócio do campo que o software vai resolver, estruturou o passo a passo matemático do cálculo de custos financeiros por arroba em lote e focou no processo zootécnico de Ganho Médio Diário (GMD).
 
 * **Lucas Daniel** (GitHub: @KourtneK)
    **O que fez:** Diagrama de Contexto (C4 - Nível 1)
