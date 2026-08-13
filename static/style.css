@@ -1,0 +1,23 @@
+/* --- TABELAS DE DADOS DE CAMPO --- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #dddddd;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #212529;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
