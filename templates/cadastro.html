@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Lote</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Cadastro de Novo Lote</h2>
+
+    <form action="{{ url_for('cadastro') }}" method="POST">
+        <div>
+            <label for="identificacao">Identificação do Lote:</label>
+            <input type="text" id="identificacao" name="identificacao" required>
+        </div>
+        <br>
+        <div>
+            <label for="fase_atual">Fase Atual:</label>
+            <select id="fase_atual" name="fase_atual" required>
+                <option value="Recria">Recria</option>
+                <option value="Terminação">Terminação</option>
+            </select>
+        </div>
+        <br>
+        <div>
+            <label for="data_inicio">Data de Início:</label>
+            <input type="date" id="data_inicio" name="data_inicio" required>
+        </div>
+        <br>
+        <button type="submit">Salvar Lote</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('index') }}">Voltar para a página inicial</a>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

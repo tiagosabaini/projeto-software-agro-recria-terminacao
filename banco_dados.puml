@@ -1,0 +1,28 @@
+@startuml banco_dados
+title Modelo de Banco de Dados (Entidade-Relacionamento)
+skinparam linetype ortho
+
+entity "Lote" as lote {
+* id_lote : int <> --
+* identificacao : varchar
+* fase_atual : varchar (Recria/Terminação)
+* data_inicio : date
+}
+
+entity "Despesa" as despesa {
+* id_despesa : int <> --
+* id_lote : int <> * categoria : varchar (Ração, Vacina)
+* valor : decimal
+* data_lancamento : date
+}
+
+entity "Pesagem" as pesagem {
+* id_pesagem : int <> --
+* id_lote : int <> * peso_registrado : decimal
+* data_pesagem : date
+}
+
+lote ||--o{ despesa : "possui"
+lote ||--o{ pesagem : "registra"
+@enduml
+
