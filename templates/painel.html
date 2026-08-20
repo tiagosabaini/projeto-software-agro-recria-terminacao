@@ -5,7 +5,7 @@
 {% block conteudo %}
 <h2>Painel de Viabilidade: Custo por Arroba (@)</h2>
 
-{% if custo_arroba %}
+{% if custo_arroba is not none %}
     <h3>Resultado Final do Lote</h3>
     <p><strong>Custo Médio por Arroba:</strong> R$ {{ "%.2f"|format(custo_arroba) }}</p>
 
@@ -18,16 +18,17 @@
     <div class="painel-comparativo">
         <div class="card">
             <h4>Fase: Recria</h4>
-            <p>Custo por @: R$ {{ "%.2f"|format(custo_recria) }}</p>
+            <p>Custo por @: R$ {{ "%.2f"|format(custo_recria or 0) }}</p>
         </div>
         <div class="card">
             <h4>Fase: Terminação</h4>
-            <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao) }}</p>
+            <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao or 0) }}</p>
         </div>
     </div>
 {% else %}
-    <p>Aguardando dados de processamento...</p>
+    <p>Aguardando dados de processamento... (Insira ao menos 2 pesagens com ganho de peso para calcular).</p>
 {% endif %}
 
+<br>
 <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
 {% endblock %}

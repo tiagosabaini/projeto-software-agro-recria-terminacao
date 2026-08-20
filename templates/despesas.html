@@ -16,6 +16,14 @@
     </div>
 
     <div class="campo">
+        <label for="fase">Fase</label>
+        <select name="fase" id="fase">
+            <option value="Recria">Recria</option>
+            <option value="Terminação">Terminação</option>
+        </select>
+    </div>
+
+    <div class="campo">
         <label for="valor">Valor (R$)</label>
         <input type="number" name="valor" id="valor" step="0.01" min="0" required>
     </div>
@@ -27,6 +35,7 @@
     <thead>
         <tr>
             <th>Categoria</th>
+            <th>Fase</th>
             <th>Valor (R$)</th>
             <th>Ação</th>
         </tr>
@@ -35,7 +44,8 @@
         {% for despesa in despesas %}
         <tr>
             <td>{{ despesa.categoria }}</td>
-            <td>{{ "%.2f"|format(despesa.valor) }}</td>
+            <td>{{ despesa.fase }}</td>
+            <td>R$ {{ "%.2f"|format(despesa.valor) }}</td>
             <td>
                 <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST">
                     <button type="submit" class="excluir">Excluir</button>
@@ -44,7 +54,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="3">Nenhuma despesa registrada ainda.</td>
+            <td colspan="4">Nenhuma despesa registrada ainda.</td>
         </tr>
         {% endfor %}
     </tbody>

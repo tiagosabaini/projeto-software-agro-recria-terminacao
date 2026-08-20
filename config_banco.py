@@ -1,5 +1,5 @@
-import sqlite3
 import os
+import sqlite3
 
 CAMINHO_BANCO = os.path.join(os.path.dirname(__file__), 'dados.db')
 
@@ -14,6 +14,7 @@ def criar_tabelas():
     conexao = conectar()
     cursor = conexao.cursor()
 
+    # 1. Criação das tabelas
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS lotes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,5 +40,20 @@ def criar_tabelas():
         )
     ''')
 
+    # 2. Adição da nova coluna na tabela existente
+    try:
+        cursor.execute(
+            "ALTER TABLE despesas ADD COLUMN fase TEXT NOT NULL DEFAULT"
+            " 'Recria';"
+        )
+    except sqlite3.OperationalError:
+        # A coluna já existe, ignora o erro
+        pass
+
     conexao.commit()
     conexao.close()
+
+
+# Executa a função para criar/atualizar o banco
+if __name__ == '__main__':
+    criar_tabelas()
