@@ -1,3 +1,40 @@
+/* --- ESTILO BASE E RESET --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+header {
+    background-color: #2e7d32; /* Verde Agro */
+    color: #ffffff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+    margin-bottom: 10px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
 /* --- TABELAS DE DADOS DE CAMPO --- */
 table {
     width: 100%;
@@ -20,4 +57,34 @@ th {
 
 tr:hover {
     background-color: #f1f1f1;
+}
+
+/* --- INDICADORES DE LUCRO E PREJUÍZO --- */
+.lucro {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.prejuizo {
+    color: #c62828;
+    background-color: #ffebee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+// --- BOTÕES E INTERAÇÕES --- */
+button {
+    background-color: #2e7d32;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
