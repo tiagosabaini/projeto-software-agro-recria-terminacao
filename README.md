@@ -34,6 +34,10 @@ O projeto conta com diagramas PlantUML (`.puml`) para documentação visual do b
  * **Arquitetura Técnica (`container.puml`):**
  * <img width="334" height="1006" alt="image" src="https://github.com/user-attachments/assets/ce225425-c448-409a-8f84-62bf365a876a" />
 
+ * **Cálculo GMD - Ganho Médio Diário (`fluxo_gmd.puml`):**
+ * <img width="593" height="613" alt="image" src="https://github.com/user-attachments/assets/819976e2-48ac-48e6-a621-22c0099b0327" />
+
+
    
 
  
