@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block titulo %}Lotes Cadastrados{% endblock %}
+
+{% block conteudo %}
+<h2>Lotes Cadastrados</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Identificação</th>
+            <th>Fase</th>
+            <th>Nº Bezerros</th>
+            <th>Investimento Compra</th>
+            <th>Status</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lote in lotes %}
+        <tr>
+            <td>{{ lote.identificacao }}</td>
+            <td>{{ lote.fase_atual }}</td>
+            <td>{{ lote.qtd_cabecas or 0 }} cab.</td>
+            <td>R$ {{ "%.2f"|format(lote.custo_total_compra or 0) }}</td>
+            <td>{{ lote.status or 'Em Andamento' }}</td>
+            <td><a class="botao" href="{{ url_for('painel', lote_id=lote.id) }}">Ver Painel</a></td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="6">Nenhum lote cadastrado ainda.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+{% endblock %}

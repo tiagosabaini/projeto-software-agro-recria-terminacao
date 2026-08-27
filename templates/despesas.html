@@ -3,39 +3,132 @@
 {% block titulo %}Despesas{% endblock %}
 
 {% block conteudo %}
-<h2>Registro de Despesas</h2>
+<h2>Registro de Despesas do Lote</h2>
 
-<form action="{{ url_for('despesas') }}" method="POST" class="form-caixa form-linha">
-    <div class="campo">
-        <label for="categoria">Categoria</label>
-        <select name="categoria" id="categoria">
-            <option value="Ração">Ração</option>
-            <option value="Sal">Sal</option>
-            <option value="Água">Água</option>
-        </select>
-    </div>
+<!-- Form 1: Lançamento Simples -->
+<div class="form-caixa">
+    <h3>1. Lançamento Direto de Despesa</h3>
+    <form action="{{ url_for('despesas') }}" method="POST" class="form-linha">
+        <input type="hidden" name="tipo_lancamento" value="direto">
+        
+        <div class="campo">
+            <label for="lote_id">Lote</label>
+            <select name="lote_id" required>
+                {% for lote in lotes %}
+                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <div class="campo">
-        <label for="fase">Fase</label>
-        <select name="fase" id="fase">
-            <option value="Recria">Recria</option>
-            <option value="Terminação">Terminação</option>
-        </select>
-    </div>
+        <div class="campo">
+            <label for="categoria">Categoria</label>
+            <select name="categoria">
+                <option value="Veterinário/Vacina">Veterinário/Vacina</option>
+                <option value="Frete">Frete</option>
+                <option value="Outros">Outros</option>
+            </select>
+        </div>
 
-    <div class="campo">
-        <label for="valor">Valor (R$)</label>
-        <input type="number" name="valor" id="valor" step="0.01" min="0" required>
-    </div>
+        <div class="campo">
+            <label for="valor">Valor (R$)</label>
+            <input type="number" name="valor" step="0.01" min="0" required>
+        </div>
 
-    <button type="submit">Salvar</button>
-</form>
+        <button type="submit">Salvar</button>
+    </form>
+</div>
 
+<!-- Form 2: Calculadora de Pastagem -->
+<div class="form-caixa">
+    <h3>2. Calculadora de Pastagem</h3>
+    <form action="{{ url_for('despesas') }}" method="POST">
+        <input type="hidden" name="tipo_lancamento" value="pastagem">
+        
+        <div class="campo">
+            <label>Selecione o Lote</label>
+            <select name="lote_id" required>
+                {% for lote in lotes %}
+                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-linha">
+            <div class="campo">
+                <label>Qtd Bois</label>
+                <input type="number" name="qtd_bois" required>
+            </div>
+            <div class="campo">
+                <label>Meses no Pasto</label>
+                <input type="number" step="0.1" name="meses" required>
+            </div>
+            <div class="campo">
+                <label>Valor R$/mês por boi</label>
+                <input type="number" step="0.01" name="valor_mes_cabeca" required>
+            </div>
+        </div>
+
+        <button type="submit" style="margin-top: 10px;">Calcular e Lançar Pasto</button>
+    </form>
+</div>
+
+<!-- Form 3: Calculadora de Sal/Proteinado (Fórmula do Caderno) -->
+<div class="form-caixa">
+    <h3>3. Calculadora de Sal Mineral e Proteinado (Caderno)</h3>
+    <form action="{{ url_for('despesas') }}" method="POST">
+        <input type="hidden" name="tipo_lancamento" value="nutricao">
+        
+        <div class="campo">
+            <label>Selecione o Lote</label>
+            <select name="lote_id" required>
+                {% for lote in lotes %}
+                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-linha">
+            <div class="campo">
+                <label>Consumo diário por boi (g)</label>
+                <input type="number" name="gramas_dia" placeholder="Ex: 150" required>
+            </div>
+            <div class="campo">
+                <label>Tempo (Meses)</label>
+                <input type="number" step="0.1" name="meses_nutricao" placeholder="Ex: 13" required>
+            </div>
+            <div class="campo">
+                <label>Peso do Saco (kg)</label>
+                <input type="number" name="peso_saco_kg" value="25" required>
+            </div>
+        </div>
+
+        <div class="form-linha" style="margin-top: 10px;">
+            <div class="campo">
+                <label>Preço do Saco (R$)</label>
+                <input type="number" step="0.01" name="preco_saco" placeholder="Ex: 96.00" required>
+            </div>
+            <div class="campo">
+                <label>Quantidade de Bois</label>
+                <input type="number" name="qtd_bois_nutricao" placeholder="Ex: 13" required>
+            </div>
+            <div class="campo">
+                <label>Adicional (Ex: SuperGold) R$</label>
+                <input type="number" step="0.01" name="valor_adicional" value="0">
+            </div>
+        </div>
+
+        <button type="submit" style="margin-top: 10px;">Calcular Nutrição e Lançar</button>
+    </form>
+</div>
+
+<!-- Tabela de Histórico de Despesas -->
+<h3>Histórico de Despesas</h3>
 <table>
     <thead>
         <tr>
+            <th>Lote</th>
             <th>Categoria</th>
-            <th>Fase</th>
+            <th>Detalhes / Observação</th>
             <th>Valor (R$)</th>
             <th>Ação</th>
         </tr>
@@ -43,8 +136,9 @@
     <tbody>
         {% for despesa in despesas %}
         <tr>
+            <td>{{ despesa.identificacao }}</td>
             <td>{{ despesa.categoria }}</td>
-            <td>{{ despesa.fase }}</td>
+            <td>{{ despesa.observacao or '—' }}</td>
             <td>R$ {{ "%.2f"|format(despesa.valor) }}</td>
             <td>
                 <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST">
@@ -54,7 +148,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="4">Nenhuma despesa registrada ainda.</td>
+            <td colspan="5">Nenhuma despesa registrada ainda.</td>
         </tr>
         {% endfor %}
     </tbody>

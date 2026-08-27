@@ -3,32 +3,73 @@
 {% block titulo %}Painel Financeiro{% endblock %}
 
 {% block conteudo %}
-<h2>Painel de Viabilidade: Custo por Arroba (@)</h2>
+<h2>Fechamento de Lote e Reposição</h2>
 
-{% if custo_arroba is not none %}
-    <h3>Resultado Final do Lote</h3>
-    <p><strong>Custo Médio por Arroba:</strong> R$ {{ "%.2f"|format(custo_arroba) }}</p>
+<form action="{{ url_for('painel') }}" method="GET" class="form-caixa form-linha">
+    <div class="campo">
+        <label for="lote_id">Selecione o Lote</label>
+        <select name="lote_id" id="lote_id" required>
+            <option value="">Selecione um lote</option>
+            {% for lote in lotes %}
+            <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
+                {{ lote.identificacao }} ({{ lote.status }})
+            </option>
+            {% endfor %}
+        </select>
+    </div>
 
-    {% if lucro %}
-        <div class="alerta-verde">✔ A cotação atual cobre os custos. Lote com projeção de lucro!</div>
-    {% else %}
-        <div class="alerta-vermelho">⚠ ALERTA: Custo de produção supera o preço mínimo de venda recomendado. Prejuízo!</div>
-    {% endif %}
+    <button type="submit">Ver Fechamento</button>
+</form>
 
+{% if lote_selecionado %}
+    <div class="form-caixa">
+        <h3>Registrar Venda no Frigorífico (Fechamento)</h3>
+        <form action="{{ url_for('registrar_venda') }}" method="POST" class="form-linha">
+            <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+            
+            <div class="campo">
+                <label>Total de Arrobas Vendidas (@)</label>
+                <input type="number" step="0.01" name="total_arrobas_vendidas" value="{{ lote_selecionado.total_arrobas_vendidas }}" required>
+            </div>
+
+            <div class="campo">
+                <label>Valor Total Recebido (R$)</label>
+                <input type="number" step="0.01" name="valor_venda_total" value="{{ lote_selecionado.valor_venda_total }}" required>
+            </div>
+
+            <button type="submit">Finalizar Venda do Lote</button>
+        </form>
+    </div>
+
+    {% if balanco %}
     <div class="painel-comparativo">
         <div class="card">
-            <h4>Fase: Recria</h4>
-            <p>Custo por @: R$ {{ "%.2f"|format(custo_recria or 0) }}</p>
+            <h4>(+) Receita da Venda no Frigorífico</h4>
+            <p><strong>Total Recebido:</strong> R$ {{ "%.2f"|format(balanco.receita_venda) }}</p>
+            <p><strong>Arrobas Vendidas:</strong> {{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas) }} @</p>
+            <p><strong>Média por Boi:</strong> {{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</p>
         </div>
+
         <div class="card">
-            <h4>Fase: Terminação</h4>
-            <p>Custo por @: R$ {{ "%.2f"|format(custo_terminacao or 0) }}</p>
+            <h4>(-) Custos do Ciclo</h4>
+            <p><strong>Compra de Bezerros:</strong> R$ {{ "%.2f"|format(balanco.custo_compra_bezerros) }}</p>
+            <p><strong>Despesas (Pasto + Sal + Insumos):</strong> R$ {{ "%.2f"|format(balanco.custo_despesas) }}</p>
+            <p><strong>Custo Total de Produção:</strong> R$ {{ "%.2f"|format(balanco.custo_total_operacao) }}</p>
         </div>
     </div>
-{% else %}
-    <p>Aguardando dados de processamento... (Insira ao menos 2 pesagens com ganho de peso para calcular).</p>
+
+    {% if balanco.sobra_liquida >= 0 %}
+        <div class="alerta-verde">
+            ✔ <strong>Lucro Líquido Real:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida) }} 
+            (Sobra final no bolso após pagar a compra dos novos bezerros e o pasto/sal).
+        </div>
+    {% else %}
+        <div class="alerta-vermelho">
+            ⚠ <strong>Resultado Negativo:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida) }}
+        </div>
+    {% endif %}
+    {% endif %}
 {% endif %}
 
-<br>
 <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
 {% endblock %}

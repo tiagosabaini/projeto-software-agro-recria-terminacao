@@ -7,6 +7,15 @@
 
 <form action="{{ url_for('pesagem') }}" method="POST" class="form-caixa form-linha">
     <div class="campo">
+        <label for="lote_id">Lote</label>
+        <select name="lote_id" id="lote_id" required>
+            {% for lote in lotes %}
+            <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="campo">
         <label for="peso">Peso (kg)</label>
         <input type="number" name="peso" id="peso" step="0.01" min="0" required>
     </div>
@@ -22,6 +31,7 @@
 <table>
     <thead>
         <tr>
+            <th>Lote</th>
             <th>Data</th>
             <th>Peso (kg)</th>
             <th>GMD desde a última (kg/dia)</th>
@@ -30,6 +40,7 @@
     <tbody>
         {% for p in pesagens %}
         <tr>
+            <td>{{ p.identificacao }}</td>
             <td>{{ p.data }}</td>
             <td>{{ "%.2f"|format(p.peso) }}</td>
             <td>
@@ -43,7 +54,7 @@
         </tr>
         {% else %}
         <tr>
-            <td colspan="3">Nenhuma pesagem registrada ainda.</td>
+            <td colspan="4">Nenhuma pesagem registrada ainda.</td>
         </tr>
         {% endfor %}
     </tbody>
