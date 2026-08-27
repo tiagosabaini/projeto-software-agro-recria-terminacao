@@ -1,0 +1,17 @@
+@startuml container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Diagrama de Contêiner: Arquitetura Técnica
+
+Person(usuario, "Usuário do Campo", "Acessa o sistema para gerenciar os lotes.")
+
+System_Boundary(c1, "Sistema de Recria e Terminação") {
+Container(frontend, "Frontend (Telas Web)", "HTML, CSS, JavaScript", "Interface para o usuário lançar despesas e pesagens (index.html, style.css).")
+Container(backend, "Servidor Backend", "Python, Flask", "Processa os cálculos (app.py) e regras de negócio agropecuárias.")
+ContainerDb(database, "Banco de Dados", "Relacional", "Armazena os registros (config_banco.py) de animais, despesas e pesagens.")
+}
+
+Rel(usuario, frontend, "Interage via", "Navegador Web")
+Rel(frontend, backend, "Envia dados e requisições via", "HTTP")
+Rel(backend, database, "Lê e grava informações", "Conexão SQL")
+@enduml
