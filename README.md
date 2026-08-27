@@ -31,3 +31,10 @@ O projeto conta com diagramas PlantUML (`.puml`) para documentação visual do b
 * **Fluxo de Cálculo (`fluxo_custo_arroba.puml`):** Diagrama de atividades detalhando a lógica de processamento do custo por arroba e projeção de lucro.
  <img width="515" height="650" alt="image" src="https://github.com/user-attachments/assets/d09c8c52-37fc-4be0-9f4d-ce039c9b541c" />
 
+ * **Arquitetura Técnica (`container.puml`):**
+ * <img width="334" height="1006" alt="image" src="https://github.com/user-attachments/assets/ce225425-c448-409a-8f84-62bf365a876a" />
+
+   
+
+ 
+
