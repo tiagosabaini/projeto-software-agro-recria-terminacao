@@ -8,30 +8,45 @@
 <form action="{{ url_for('cadastro') }}" method="POST" class="form-caixa">
     <div class="campo">
         <label for="identificacao">Identificação do Lote:</label>
-        <input type="text" id="identificacao" name="identificacao" placeholder="Ex: Lote 13 Bois Nelore" required>
+        <input type="text" id="identificacao" name="identificacao" placeholder="Ex: Lote 13 Nelore Brando" required>
+    </div>
+
+    <div class="form-linha">
+        <div class="campo">
+            <label for="categoria_animal">Categoria do Animal:</label>
+            <select id="categoria_animal" name="categoria_animal" required>
+                <option value="Bezerro">Bezerro(a) - Desmama</option>
+                <option value="Garrote">Garrote / Novilha</option>
+                <option value="Boi Magro">Boi Magro</option>
+                <option value="Boi Gordo">Boi Gordo</option>
+            </select>
+        </div>
+
+        <div class="campo">
+            <label for="fase_atual">Fase da Operação:</label>
+            <select id="fase_atual" name="fase_atual" required>
+                <option value="Recria">Recria</option>
+                <option value="Terminação">Terminação (Engorda)</option>
+            </select>
+        </div>
     </div>
 
     <div class="campo">
-        <label for="fase_atual">Fase Atual:</label>
-        <select id="fase_atual" name="fase_atual" required>
-            <option value="Recria">Recria</option>
-            <option value="Terminação">Terminação</option>
-        </select>
+        <label for="data_inicio">Data de Entrada (Opcional):</label>
+        <input type="date" id="data_inicio" name="data_inicio">
+        <small style="color: var(--texto-suave); font-size: 0.8rem;">Deixe em branco se não souber a data exata.</small>
     </div>
 
-    <div class="campo">
-        <label for="data_inicio">Data de Entrada:</label>
-        <input type="date" id="data_inicio" name="data_inicio" required>
-    </div>
+    <div class="form-linha">
+        <div class="campo">
+            <label for="qtd_cabecas">Qtd. de Cabeças:</label>
+            <input type="number" id="qtd_cabecas" name="qtd_cabecas" min="1" required>
+        </div>
 
-    <div class="campo">
-        <label for="qtd_cabecas">Quantidade de Cabeças (Bezerros):</label>
-        <input type="number" id="qtd_cabecas" name="qtd_cabecas" min="1" required>
-    </div>
-
-    <div class="campo">
-        <label for="custo_bezerro_unitario">Valor Pago por Bezerro (R$):</label>
-        <input type="number" id="custo_bezerro_unitario" name="custo_bezerro_unitario" step="0.01" min="0" required>
+        <div class="campo">
+            <label for="custo_bezerro_unitario">Valor por Cabeça (R$):</label>
+            <input type="number" id="custo_bezerro_unitario" name="custo_bezerro_unitario" step="0.01" min="0" required>
+        </div>
     </div>
 
     <button type="submit">Salvar Lote</button>

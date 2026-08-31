@@ -5,34 +5,47 @@
 {% block conteudo %}
 <h2>Lotes Cadastrados</h2>
 
-<table>
-    <thead>
-        <tr>
-            <th>Identificação</th>
-            <th>Fase</th>
-            <th>Nº Bezerros</th>
-            <th>Investimento Compra</th>
-            <th>Status</th>
-            <th>Ação</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for lote in lotes %}
-        <tr>
-            <td>{{ lote.identificacao }}</td>
-            <td>{{ lote.fase_atual }}</td>
-            <td>{{ lote.qtd_cabecas or 0 }} cab.</td>
-            <td>R$ {{ "%.2f"|format(lote.custo_total_compra or 0) }}</td>
-            <td>{{ lote.status or 'Em Andamento' }}</td>
-            <td><a class="botao" href="{{ url_for('painel', lote_id=lote.id) }}">Ver Painel</a></td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="6">Nenhum lote cadastrado ainda.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div style="overflow-x: auto;">
+    <table>
+        <thead>
+            <tr>
+                <th>Identificação</th>
+                <th>Data de Entrada</th>
+                <th>Categoria / Fase</th>
+                <th>Nº Cabeças</th>
+                <th>Status</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lote in lotes %}
+            <tr>
+                <td><strong>{{ lote.identificacao }}</strong></td>
+                <td>{{ lote.data_inicio | data_br }}</td>
+                <td>{{ lote.categoria_animal or '—' }} <br> <small style="color: var(--texto-suave);">({{ lote.fase_atual }})</small></td>
+                <td>{{ lote.qtd_cabecas or 0 }} cab.</td>
+                <td>
+                    {% if lote.status == 'Finalizado' %}
+                        <span style="color: #A65D45; font-weight: bold;">{{ lote.status }}</span>
+                    {% else %}
+                        <span style="color: #3F6650; font-weight: bold;">{{ lote.status or 'Em Andamento' }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display: flex; gap: 8px;">
+                        <a class="botao" href="{{ url_for('painel', lote_id=lote.id) }}">Painel</a>
+                        <a class="botao" style="background-color: #E2DDD0; color: #2D2D2A;" href="{{ url_for('editar_lote', id=lote.id) }}">Atualizar Fase</a>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Nenhum lote cadastrado ainda.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
 {% endblock %}

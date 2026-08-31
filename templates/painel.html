@@ -29,12 +29,12 @@
             
             <div class="campo">
                 <label>Total de Arrobas Vendidas (@)</label>
-                <input type="number" step="0.01" name="total_arrobas_vendidas" value="{{ lote_selecionado.total_arrobas_vendidas }}" required>
+                <input type="number" step="0.01" name="total_arrobas_vendidas" value="{{ lote_selecionado.total_arrobas_vendidas or '' }}" required>
             </div>
 
             <div class="campo">
                 <label>Valor Total Recebido (R$)</label>
-                <input type="number" step="0.01" name="valor_venda_total" value="{{ lote_selecionado.valor_venda_total }}" required>
+                <input type="number" step="0.01" name="valor_venda_total" value="{{ lote_selecionado.valor_venda_total or '' }}" required>
             </div>
 
             <button type="submit">Finalizar Venda do Lote</button>
@@ -45,27 +45,28 @@
     <div class="painel-comparativo">
         <div class="card">
             <h4>(+) Receita da Venda no Frigorífico</h4>
-            <p><strong>Total Recebido:</strong> R$ {{ "%.2f"|format(balanco.receita_venda) }}</p>
-            <p><strong>Arrobas Vendidas:</strong> {{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas) }} @</p>
-            <p><strong>Média por Boi:</strong> {{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</p>
+            <p><strong>Total Recebido:</strong> <span>R$ {{ "%.2f"|format(balanco.receita_venda or 0) }}</span></p>
+            <p><strong>Arrobas Vendidas:</strong> <span>{{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas or 0) }} @</span></p>
+            <p><strong>Média por Boi:</strong> <span>{{ "%.2f"|format((lote_selecionado.total_arrobas_vendidas or 0) / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</span></p>
         </div>
 
         <div class="card">
             <h4>(-) Custos do Ciclo</h4>
-            <p><strong>Compra de Bezerros:</strong> R$ {{ "%.2f"|format(balanco.custo_compra_bezerros) }}</p>
-            <p><strong>Despesas (Pasto + Sal + Insumos):</strong> R$ {{ "%.2f"|format(balanco.custo_despesas) }}</p>
-            <p><strong>Custo Total de Produção:</strong> R$ {{ "%.2f"|format(balanco.custo_total_operacao) }}</p>
+            <p><strong>Compra de Animais:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_compra_bezerros or 0) }}</span></p>
+            <p><strong>Despesas (Pasto + Sal + Insumos):</strong> <span>R$ {{ "%.2f"|format(balanco.custo_despesas or 0) }}</span></p>
+            <p><strong>Custo Total de Produção:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}</span></p>
         </div>
     </div>
 
     {% if balanco.sobra_liquida >= 0 %}
         <div class="alerta-verde">
-            ✔ <strong>Lucro Líquido Real:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida) }} 
-            (Sobra final no bolso após pagar a compra dos novos bezerros e o pasto/sal).
+            ✔ <strong>Lucro Líquido Real:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }} 
+            <br>
+            (Sobra final no bolso após pagar o investimento inicial e o custo do ciclo).
         </div>
     {% else %}
         <div class="alerta-vermelho">
-            ⚠ <strong>Resultado Negativo:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida) }}
+            ⚠ <strong>Resultado Negativo (Prejuízo):</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}
         </div>
     {% endif %}
     {% endif %}

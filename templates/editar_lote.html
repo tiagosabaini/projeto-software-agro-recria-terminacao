@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block titulo %}Atualizar Lote{% endblock %}
+
+{% block conteudo %}
+<h2>Atualizar Estágio do Lote</h2>
+
+<div class="form-caixa">
+    <p style="margin-bottom: 20px;">Você está atualizando o lote: <strong>{{ lote.identificacao }}</strong></p>
+    
+    <form action="{{ url_for('editar_lote', id=lote.id) }}" method="POST">
+        <div class="form-linha">
+            <div class="campo">
+                <label for="categoria_animal">Nova Categoria:</label>
+                <select id="categoria_animal" name="categoria_animal" required>
+                    <option value="Bezerro" {% if lote.categoria_animal == 'Bezerro' %}selected{% endif %}>Bezerro(a) - Desmama</option>
+                    <option value="Garrote" {% if lote.categoria_animal == 'Garrote' %}selected{% endif %}>Garrote / Novilha</option>
+                    <option value="Boi Magro" {% if lote.categoria_animal == 'Boi Magro' %}selected{% endif %}>Boi Magro</option>
+                    <option value="Boi Gordo" {% if lote.categoria_animal == 'Boi Gordo' %}selected{% endif %}>Boi Gordo</option>
+                </select>
+            </div>
+    
+            <div class="campo">
+                <label for="fase_atual">Nova Fase:</label>
+                <select id="fase_atual" name="fase_atual" required>
+                    <option value="Recria" {% if lote.fase_atual == 'Recria' %}selected{% endif %}>Recria</option>
+                    <option value="Terminação" {% if lote.fase_atual == 'Terminação' %}selected{% endif %}>Terminação (Engorda)</option>
+                </select>
+            </div>
+        </div>
+    
+        <button type="submit">Salvar Atualização</button>
+    </form>
+</div>
+
+<a class="voltar" href="{{ url_for('lotes') }}">← Voltar para a lista de lotes</a>
+{% endblock %}
