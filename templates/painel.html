@@ -3,7 +3,7 @@
 {% block titulo %}Painel Financeiro{% endblock %}
 
 {% block conteudo %}
-<h2>Fechamento de Lote e Reposição</h2>
+<h2>Painel e Resultado do Lote</h2>
 
 <form action="{{ url_for('painel') }}" method="GET" class="form-caixa form-linha">
     <div class="campo">
@@ -18,59 +18,166 @@
         </select>
     </div>
 
-    <button type="submit">Ver Fechamento</button>
+    <button type="submit">Acessar Painel</button>
 </form>
 
 {% if lote_selecionado %}
-    <div class="form-caixa">
-        <h3>Registrar Venda no Frigorífico (Fechamento)</h3>
-        <form action="{{ url_for('registrar_venda') }}" method="POST" class="form-linha">
-            <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+
+    <!-- Resumo de Custos Atuais (Aparece para todos) -->
+    <div class="form-caixa" style="text-align: center; padding: 32px 20px;">
+        <h3 style="margin-bottom: 8px; font-size: 1.5rem;">{{ lote_selecionado.identificacao }}</h3>
+        <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 1rem;">
+            Cabeças: <strong>{{ lote_selecionado.qtd_cabecas or 0 }}</strong> | 
+            Status: <strong>{{ lote_selecionado.status }}</strong>
+        </p>
+        <div style="background-color: var(--creme); padding: 20px; border-radius: var(--raio); border: 1px solid var(--borda); display: inline-block; min-width: 60%;">
+            <span style="font-size: 0.95rem; color: var(--texto-suave); font-weight: 600;">Custo Total Acumulado (Compra + Despesas)</span><br>
+            <strong style="font-size: 1.5rem; color: var(--terracota-escuro); display: block; margin-top: 8px;">
+                R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}
+            </strong>
+        </div>
+    </div>
+
+
+    {% if lote_selecionado.status == 'Em Andamento' %}
+        
+        <!-- MÓDULO DE SIMULAÇÃO HARMONIZADO -->
+        <div class="form-caixa" style="background: linear-gradient(145deg, #ffffff, #f9fbf9); border: 2px solid var(--verde-salvia); box-shadow: 0 8px 24px rgba(143, 185, 155, 0.15);">
+            <div style="text-align: center; margin-bottom: 32px;">
+                <span style="font-size: 2.2rem; display: block; margin-bottom: 12px;">📊</span>
+                <h3 style="margin-bottom: 12px; color: var(--verde-escuro); font-size: 1.4rem;">Simulador de Venda</h3>
+                <p style="font-size: 0.95rem; color: var(--texto-suave); margin: 0; line-height: 1.5;">
+                    Teste diferentes pesos e preços da arroba para descobrir o lucro estimado. <br>
+                    <em>Estes dados são apenas simulações e não serão salvos.</em>
+                </p>
+            </div>
             
-            <div class="campo">
-                <label>Total de Arrobas Vendidas (@)</label>
-                <input type="number" step="0.01" name="total_arrobas_vendidas" value="{{ lote_selecionado.total_arrobas_vendidas or '' }}" required>
+            <div class="form-linha" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px dashed var(--borda);">
+                <div class="campo">
+                    <label>Média Estimada de Arrobas (@) por Boi</label>
+                    <input type="number" id="sim_arroba_boi" step="0.1" placeholder="Ex: 21.5" oninput="calcularSimulacao()" style="background-color: var(--branco);">
+                </div>
+                <div class="campo">
+                    <label>Preço da Arroba Hoje (R$)</label>
+                    <input type="number" id="sim_preco_arroba" step="0.01" placeholder="Ex: 280.00" oninput="calcularSimulacao()" style="background-color: var(--branco);">
+                </div>
             </div>
-
-            <div class="campo">
-                <label>Valor Total Recebido (R$)</label>
-                <input type="number" step="0.01" name="valor_venda_total" value="{{ lote_selecionado.valor_venda_total or '' }}" required>
+            
+            <!-- Área de Resultados do Simulador -->
+            <div style="background-color: var(--creme); padding: 24px; border-radius: var(--raio-peq); border: 1px solid var(--borda);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span style="color: var(--texto-suave); font-weight: 600;">Total de Arrobas Esperado:</span>
+                    <strong style="font-size: 1.1rem; color: var(--texto);"><span id="res_total_arrobas">0.00</span> @</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <span style="color: var(--texto-suave); font-weight: 600;">Receita Bruta Estimada:</span>
+                    <strong style="font-size: 1.1rem; color: var(--texto);">R$ <span id="res_receita">0.00</span></strong>
+                </div>
+                
+                <div style="background-color: var(--branco); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--verde-salvia);">
+                    <span style="font-weight: 700; color: var(--verde-escuro); font-size: 1.1rem;">Lucro Líquido Estimado:</span>
+                    <strong id="res_lucro" style="font-size: 1.6rem; color: var(--texto);">R$ 0.00</strong>
+                </div>
             </div>
-
-            <button type="submit">Finalizar Venda do Lote</button>
-        </form>
-    </div>
-
-    {% if balanco %}
-    <div class="painel-comparativo">
-        <div class="card">
-            <h4>(+) Receita da Venda no Frigorífico</h4>
-            <p><strong>Total Recebido:</strong> <span>R$ {{ "%.2f"|format(balanco.receita_venda or 0) }}</span></p>
-            <p><strong>Arrobas Vendidas:</strong> <span>{{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas or 0) }} @</span></p>
-            <p><strong>Média por Boi:</strong> <span>{{ "%.2f"|format((lote_selecionado.total_arrobas_vendidas or 0) / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</span></p>
         </div>
 
-        <div class="card">
-            <h4>(-) Custos do Ciclo</h4>
-            <p><strong>Compra de Animais:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_compra_bezerros or 0) }}</span></p>
-            <p><strong>Despesas (Pasto + Sal + Insumos):</strong> <span>R$ {{ "%.2f"|format(balanco.custo_despesas or 0) }}</span></p>
-            <p><strong>Custo Total de Produção:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}</span></p>
-        </div>
-    </div>
+        <script>
+            function calcularSimulacao() {
+                const qtdCabecas = {{ lote_selecionado.qtd_cabecas or 1 }};
+                const custoTotal = {{ balanco.custo_total_operacao or 0 }};
+                
+                const arrobaPorBoi = parseFloat(document.getElementById('sim_arroba_boi').value) || 0;
+                const precoArroba = parseFloat(document.getElementById('sim_preco_arroba').value) || 0;
+                
+                const totalArrobas = arrobaPorBoi * qtdCabecas;
+                const receita = totalArrobas * precoArroba;
+                const lucro = receita - custoTotal;
+                
+                document.getElementById('res_total_arrobas').innerText = totalArrobas.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('res_receita').innerText = receita.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                const elLucro = document.getElementById('res_lucro');
+                elLucro.innerText = "R$ " + lucro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                if(lucro > 0) {
+                    elLucro.style.color = "#3F6650"; // Verde (Lucro)
+                } else if (lucro < 0) {
+                    elLucro.style.color = "#A65D45"; // Vermelho (Prejuízo)
+                } else {
+                    elLucro.style.color = "var(--texto)";
+                }
+            }
+        </script>
 
-    {% if balanco.sobra_liquida >= 0 %}
-        <div class="alerta-verde">
-            ✔ <strong>Lucro Líquido Real:</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }} 
-            <br>
-            (Sobra final no bolso após pagar o investimento inicial e o custo do ciclo).
+        <!-- FECHAMENTO DEFINITIVO HARMONIZADO -->
+        <div class="form-caixa" style="margin-top: 40px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h3 style="margin-bottom: 8px;">Registrar Venda (Fechamento Definitivo)</h3>
+                <p style="font-size: 0.95rem; color: var(--texto-suave);">
+                    Use os dados reais da nota oficial do frigorífico para fechar este lote. <br>
+                    <strong>Atenção:</strong> Esta ação moverá o lote para "Finalizado".
+                </p>
+            </div>
+            
+            <form action="{{ url_for('registrar_venda') }}" method="POST" class="form-linha">
+                <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+                
+                <div class="campo">
+                    <label>Total de Arrobas Real (@)</label>
+                    <input type="number" step="0.01" name="total_arrobas_vendidas" required>
+                </div>
+
+                <div class="campo">
+                    <label>Valor Total Recebido (R$)</label>
+                    <input type="number" step="0.01" name="valor_venda_total" required>
+                </div>
+
+                <button type="submit" style="margin-top: 15px;">Finalizar Lote</button>
+            </form>
         </div>
+
     {% else %}
-        <div class="alerta-vermelho">
-            ⚠ <strong>Resultado Negativo (Prejuízo):</strong> R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}
+        
+        <!-- MÓDULO DE RESULTADO FINAL (Exclusivo para lotes já vendidos) -->
+        <div class="painel-comparativo">
+            <div class="card">
+                <h4>(+) Receita da Venda</h4>
+                <p><strong>Total Recebido:</strong> <span>R$ {{ "%.2f"|format(balanco.receita_venda or 0) }}</span></p>
+                <p><strong>Arrobas Vendidas:</strong> <span>{{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas or 0) }} @</span></p>
+                <p><strong>Média por Boi:</strong> <span>{{ "%.2f"|format((lote_selecionado.total_arrobas_vendidas or 0) / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</span></p>
+            </div>
+
+            <div class="card">
+                <h4>(-) Custos do Ciclo</h4>
+                <p><strong>Compra de Animais:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_compra_bezerros or 0) }}</span></p>
+                <p><strong>Despesas (Pasto + Sal + Insumos):</strong> <span>R$ {{ "%.2f"|format(balanco.custo_despesas or 0) }}</span></p>
+                <p><strong>Custo Total:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}</span></p>
+            </div>
         </div>
+
+        {% if balanco.sobra_liquida >= 0 %}
+            <div class="alerta-verde" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
+                <div>
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">✔</span>
+                    <strong>Lucro Líquido Real: R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
+                    <br>
+                    <span style="font-size: 0.95rem; font-weight: normal; color: var(--verde-escuro);">Sobra final após pagar o investimento inicial e o custo do ciclo.</span>
+                </div>
+            </div>
+        {% else %}
+            <div class="alerta-vermelho" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
+                <div>
+                    <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">⚠</span>
+                    <strong>Resultado Negativo (Prejuízo): R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
+                </div>
+            </div>
+        {% endif %}
+        
     {% endif %}
-    {% endif %}
+    
 {% endif %}
 
-<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+<div style="text-align: center; margin-top: 24px;">
+    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+</div>
 {% endblock %}

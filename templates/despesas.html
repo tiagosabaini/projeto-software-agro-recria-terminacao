@@ -3,24 +3,28 @@
 {% block titulo %}Despesas{% endblock %}
 
 {% block conteudo %}
-<h2>Registro de Despesas do Lote</h2>
+<div style="text-align: center; margin-bottom: 32px;">
+    <h2>Registro de Despesas do Lote</h2>
+    <p style="color: var(--texto-suave);">Lançamentos de custos diretos, pastagem e nutrição do rebanho.</p>
+</div>
 
 <!-- Form 1: Lançamento Simples -->
-<div class="form-caixa">
+<div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 24px;">
     <h3>1. Lançamento Direto de Despesa</h3>
     <form action="{{ url_for('despesas') }}" method="POST" class="form-linha">
         <input type="hidden" name="tipo_lancamento" value="direto">
         
-        <div class="campo">
+        <div class="campo" style="flex: 2;">
             <label for="lote_id">Lote</label>
             <select name="lote_id" required>
+                <option value="">Selecione...</option>
                 {% for lote in lotes %}
-                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                <option value="{{ lote.id }}">{{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)</option>
                 {% endfor %}
             </select>
         </div>
 
-        <div class="campo">
+        <div class="campo" style="flex: 1.5;">
             <label for="categoria">Categoria</label>
             <select name="categoria">
                 <option value="Veterinário/Vacina">Veterinário/Vacina</option>
@@ -29,17 +33,17 @@
             </select>
         </div>
 
-        <div class="campo">
+        <div class="campo" style="flex: 1;">
             <label for="valor">Valor (R$)</label>
             <input type="number" name="valor" step="0.01" min="0" required>
         </div>
 
-        <button type="submit">Salvar</button>
+        <button type="submit" style="margin-bottom: 20px;">Salvar</button>
     </form>
 </div>
 
 <!-- Form 2: Calculadora de Pastagem -->
-<div class="form-caixa">
+<div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 24px;">
     <h3>2. Calculadora de Pastagem</h3>
     <form action="{{ url_for('despesas') }}" method="POST">
         <input type="hidden" name="tipo_lancamento" value="pastagem">
@@ -47,8 +51,9 @@
         <div class="campo">
             <label>Selecione o Lote</label>
             <select name="lote_id" required>
+                <option value="">Selecione...</option>
                 {% for lote in lotes %}
-                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                <option value="{{ lote.id }}">{{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)</option>
                 {% endfor %}
             </select>
         </div>
@@ -68,12 +73,12 @@
             </div>
         </div>
 
-        <button type="submit" style="margin-top: 10px;">Calcular e Lançar Pasto</button>
+        <button type="submit" style="margin-top: 15px; width: 100%;">Calcular e Lançar Pasto</button>
     </form>
 </div>
 
-<!-- Form 3: Calculadora de Sal/Proteinado (Fórmula do Caderno) -->
-<div class="form-caixa">
+<!-- Form 3: Calculadora de Sal/Proteinado -->
+<div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 40px;">
     <h3>3. Calculadora de Sal Mineral e Proteinado (Caderno)</h3>
     <form action="{{ url_for('despesas') }}" method="POST">
         <input type="hidden" name="tipo_lancamento" value="nutricao">
@@ -81,8 +86,9 @@
         <div class="campo">
             <label>Selecione o Lote</label>
             <select name="lote_id" required>
+                <option value="">Selecione...</option>
                 {% for lote in lotes %}
-                <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
+                <option value="{{ lote.id }}">{{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)</option>
                 {% endfor %}
             </select>
         </div>
@@ -102,7 +108,7 @@
             </div>
         </div>
 
-        <div class="form-linha" style="margin-top: 10px;">
+        <div class="form-linha" style="margin-top: 15px;">
             <div class="campo">
                 <label>Preço do Saco (R$)</label>
                 <input type="number" step="0.01" name="preco_saco" placeholder="Ex: 96.00" required>
@@ -117,42 +123,51 @@
             </div>
         </div>
 
-        <button type="submit" style="margin-top: 10px;">Calcular Nutrição e Lançar</button>
+        <button type="submit" style="margin-top: 15px; width: 100%;">Calcular Nutrição e Lançar</button>
     </form>
 </div>
 
 <!-- Tabela de Histórico de Despesas -->
-<h3>Histórico de Despesas</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Lote</th>
-            <th>Categoria</th>
-            <th>Detalhes / Observação</th>
-            <th>Valor (R$)</th>
-            <th>Ação</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for despesa in despesas %}
-        <tr>
-            <td>{{ despesa.identificacao }}</td>
-            <td>{{ despesa.categoria }}</td>
-            <td>{{ despesa.observacao or '—' }}</td>
-            <td>R$ {{ "%.2f"|format(despesa.valor) }}</td>
-            <td>
-                <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST">
-                    <button type="submit" class="excluir">Excluir</button>
-                </form>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="5">Nenhuma despesa registrada ainda.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div style="max-width: 850px; margin: 0 auto;">
+    <h3 style="text-align: center; margin-bottom: 20px;">Histórico de Despesas</h3>
+    
+    <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Lote</th>
+                        <th>Categoria</th>
+                        <th>Detalhes / Observação</th>
+                        <th>Valor (R$)</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for despesa in despesas %}
+                    <tr>
+                        <td><strong>{{ despesa.identificacao }}</strong></td>
+                        <td>{{ despesa.categoria }}</td>
+                        <td style="color: var(--texto-suave);">{{ despesa.observacao or '—' }}</td>
+                        <td style="font-weight: bold; color: var(--terracota-escuro);">R$ {{ "%.2f"|format(despesa.valor) }}</td>
+                        <td>
+                            <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente apagar esta despesa?');">
+                                <button type="submit" class="excluir" style="margin-top: 0; padding: 6px 14px; border-radius: 999px;">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: var(--texto-suave);">Nenhuma despesa registrada ainda.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+<div style="text-align: center; margin-top: 40px;">
+    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+</div>
 {% endblock %}

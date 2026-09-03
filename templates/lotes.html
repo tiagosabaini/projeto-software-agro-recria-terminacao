@@ -32,9 +32,18 @@
                     {% endif %}
                 </td>
                 <td>
-                    <div style="display: flex; gap: 8px;">
-                        <a class="botao" href="{{ url_for('painel', lote_id=lote.id) }}">Painel</a>
-                        <a class="botao" style="background-color: #E2DDD0; color: #2D2D2A;" href="{{ url_for('editar_lote', id=lote.id) }}">Atualizar Fase</a>
+                    <!-- Aqui está a modificação para deixar os botões na mesma altura e alinhados -->
+                    <div style="display: flex; gap: 8px; align-items: stretch;">
+                        
+                        <a class="botao" style="padding: 0 16px; font-size: 0.9rem; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;" href="{{ url_for('painel', lote_id=lote.id) }}">Painel</a>
+                        
+                        <a class="botao" style="background-color: #E2DDD0; color: #2D2D2A; padding: 0 16px; font-size: 0.9rem; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;" href="{{ url_for('editar_lote', id=lote.id) }}">Atualizar</a>
+                        
+                        <!-- Formulário e Botão de Exclusão -->
+                        <form action="{{ url_for('excluir_lote', id=lote.id) }}" method="POST" style="margin: 0; display: flex;" onsubmit="return confirm('ATENÇÃO: Tem certeza que deseja excluir o lote \'{{ lote.identificacao }}\'?\n\nTodas as despesas e pesagens associadas a ele também serão apagadas para sempre.');">
+                            <button type="submit" class="excluir" style="padding: 0 16px; font-size: 0.9rem; border-radius: 999px; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;">Excluir</button>
+                        </form>
+
                     </div>
                 </td>
             </tr>

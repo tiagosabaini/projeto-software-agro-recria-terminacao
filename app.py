@@ -58,6 +58,21 @@ def lotes():
     conexao.close()
     return render_template('lotes.html', lotes=lista_lotes)
 
+@app.route('/excluir_lote/<int:id>', methods=['POST'])
+def excluir_lote(id):
+    conexao = conectar()
+    
+    # Primeiro excluímos as despesas e pesagens vinculadas a este lote (para não deixar dados órfãos)
+    conexao.execute('DELETE FROM despesas WHERE lote_id = ?', (id,))
+    conexao.execute('DELETE FROM pesagens WHERE lote_id = ?', (id,))
+    
+    # Depois excluímos o lote em si
+    conexao.execute('DELETE FROM lotes WHERE id = ?', (id,))
+    
+    conexao.commit()
+    conexao.close()
+    
+    return redirect(url_for('lotes'))
 
 @app.route('/editar_lote/<int:id>', methods=['GET', 'POST'])
 def editar_lote(id):
@@ -109,21 +124,30 @@ def despesas():
             )
 
         # Lançamento Nutrição/Sal (Fórmula exata do caderno do pai)
+        # Lançamento Nutrição/Sal (Calculado pela quantidade de sacos e dias de consumo)
         elif tipo_lancamento == 'nutricao':
-            gramas_dia = float(request.form.get('gramas_dia', 0))
-            meses = float(request.form.get('meses_nutricao', 0))
+            qtd_sacos = float(request.form.get('qtd_sacos', 0))
             peso_saco_kg = float(request.form.get('peso_saco_kg', 25))
+            dias_consumo = float(request.form.get('dias_consumo', 1))
             preco_saco = float(request.form.get('preco_saco', 0))
-            qtd_bois = int(request.form.get('qtd_bois_nutricao', 0))
-            valor_adicional = float(request.form.get('valor_adicional', 0)) # Ex: SuperGold
+            qtd_bois = int(request.form.get('qtd_bois_nutricao', 1))
+            valor_adicional = float(request.form.get('valor_adicional', 0)) # Ex: Ouro Fino
 
-            # Cálculo: (g/dia * 30 dias * meses) / (peso_saco_kg * 1000)
-            gramas_total_por_boi = gramas_dia * 30 * meses
-            sacos_por_boi = gramas_total_por_boi / (peso_saco_kg * 1000)
-            custo_sal_por_boi = sacos_por_boi * preco_saco
-            custo_sal_total = (custo_sal_por_boi * qtd_bois) + valor_adicional
+            # Lógica de cálculo:
+            # 1. Peso total de sal consumido em kg = qtd_sacos * peso_saco_kg
+            peso_total_kg = qtd_sacos * peso_saco_kg
+            
+            # 2. Transformar em gramas e descobrir o consumo médio por dia por boi
+            # (peso_total * 1000g) / (dias_consumo * qtd_bois)
+            if dias_consumo > 0 and qtd_bois > 0:
+                gramas_dia_por_boi = (peso_total_kg * 1000) / (dias_consumo * qtd_bois)
+            else:
+                gramas_dia_por_boi = 0
 
-            obs = f"Sal/Proteinado: {gramas_dia}g/dia em {meses}m ({qtd_bois} bois) + Adicional"
+            # 3. Custo total do sal + adicional
+            custo_sal_total = (qtd_sacos * preco_saco) + valor_adicional
+
+            obs = f"Nutrição: {qtd_sacos} saco(s) de {peso_saco_kg}kg em {dias_consumo} dias ({qtd_bois} bois) (~{gramas_dia_por_boi:.0f}g/boi/dia)"
             conexao.execute(
                 'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
                 (lote_id, 'Sal/Proteinado', custo_sal_total, obs)
@@ -203,6 +227,56 @@ def pesagem():
 
     return render_template('pesagem.html', pesagens=lista_pesagens, lotes=lista_lotes)
 
+@app.route('/gmd', methods=['GET', 'POST'])
+def gmd():
+    conexao = conectar()
+    lote_selecionado = None
+    dados_gmd = []
+    
+    # Lista de todos os lotes para o select
+    lista_lotes = conexao.execute('SELECT * FROM lotes').fetchall()
+
+    if request.method == 'POST' or request.args.get('lote_id'):
+        # Permite receber tanto via POST (formulário) quanto GET (se o usuário alternar)
+        lote_id = request.form.get('lote_id') or request.args.get('lote_id')
+        
+        if lote_id:
+            lote_id = int(lote_id)
+            lote_selecionado = conexao.execute('SELECT * FROM lotes WHERE id = ?', (lote_id,)).fetchone()
+            
+            # Pega todas as pesagens daquele lote específico ordenadas por data
+            pesagens_lote = conexao.execute('''
+                SELECT * FROM pesagens WHERE lote_id = ? ORDER BY data ASC
+            ''', (lote_id,)).fetchall()
+            
+            # Lógica de cálculo do GMD entre pesagens consecutivas
+            anterior = None
+            for p in pesagens_lote:
+                gmd_valor = None
+                dias = 0
+                ganho_peso = 0
+                
+                if anterior is not None:
+                    data_atual = datetime.strptime(p['data'], '%Y-%m-%d')
+                    data_anterior = datetime.strptime(anterior['data'], '%Y-%m-%d')
+                    dias = (data_atual - data_anterior).days
+                    
+                    if dias > 0:
+                        ganho_peso = p['peso'] - anterior['peso']
+                        gmd_valor = ganho_peso / dias
+                
+                dados_gmd.append({
+                    'id': p['id'],
+                    'data': p['data'],
+                    'peso': p['peso'],
+                    'dias_intervalo': dias,
+                    'ganho_peso': ganho_peso,
+                    'gmd': gmd_valor
+                })
+                anterior = p
+
+    conexao.close()
+    return render_template('gmd.html', lotes=lista_lotes, lote_selecionado=lote_selecionado, dados_gmd=dados_gmd)
 
 @app.route('/registrar_venda', methods=['POST'])
 def registrar_venda():

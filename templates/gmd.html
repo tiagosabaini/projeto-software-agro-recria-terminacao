@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cálculo de GMD{% endblock %}
+
+{% block conteudo %}
+<div style="text-align: center; margin-bottom: 32px;">
+    <h2>Cálculo de Ganho Médio Diário (GMD)</h2>
+    <p style="color: var(--texto-suave);">Selecione um lote para acompanhar a evolução de peso e o desempenho nutricional dos animais ao longo do tempo.</p>
+</div>
+
+<!-- Seletor de Lote -->
+<form action="{{ url_for('gmd') }}" method="POST" class="form-caixa form-linha" style="max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 32px;">
+    <div class="campo" style="flex: 3;">
+        <label for="lote_id">Selecione o Lote</label>
+        <select name="lote_id" id="lote_id" required>
+            <option value="">Escolha um lote...</option>
+            {% for lote in lotes %}
+            <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
+                {{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div style="flex: 1; display: flex; align-items: flex-end;">
+        <button type="submit" style="width: 100%; margin-top: 0; height: 48px;">Analisar</button>
+    </div>
+</form>
+
+{% if lote_selecionado %}
+    <!-- Resumo do Lote Selecionado -->
+    <div class="form-caixa" style="max-width: 700px; margin-left: auto; margin-right: auto; text-align: center; padding: 24px; margin-bottom: 32px;">
+        <h3 style="margin-bottom: 6px;">{{ lote_selecionado.identificacao }}</h3>
+        <p style="color: var(--texto-suave); margin: 0;">
+            Categoria: <strong>{{ lote_selecionado.categoria_animal or '—' }}</strong> | 
+            Fase: <strong>{{ lote_selecionado.fase_atual }}</strong> | 
+            Cabeças: <strong>{{ lote_selecionado.qtd_cabecas or 0 }}</strong>
+        </p>
+    </div>
+
+    <!-- Tabela de Histórico de GMD -->
+    <div style="max-width: 850px; margin: 0 auto;">
+        <h3 style="text-align: center; margin-bottom: 20px; font-size: 1.2rem; color: var(--verde-escuro);">Evolução e Desempenho (GMD)</h3>
+        
+        <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
+            <div style="overflow-x: auto;">
+                <table style="margin: 0; box-shadow: none; border-radius: 0;">
+                    <thead>
+                        <tr style="background-color: #F4F6F4;">
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Data da Pesagem</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Peso Registrado</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Dias entre Pesagens</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Ganho no Período</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px; text-align: center;">GMD (kg/dia)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in dados_gmd %}
+                        <tr>
+                            <td style="padding: 14px 20px; font-weight: 600;">{{ item.data | data_br }}</td>
+                            <td style="padding: 14px 20px;">{{ "%.2f"|format(item.peso) }} kg</td>
+                            <td style="padding: 14px 20px; color: var(--texto-suave);">
+                                {% if item.dias_intervalo > 0 %} {{ item.dias_intervalo }} dias {% else %} — (Primeira Pesagem) {% endif %}
+                            </td>
+                            <td style="padding: 14px 20px;">
+                                {% if item.dias_intervalo > 0 %}
+                                    <span style="color: {% if item.ganho_peso >= 0 %}var(--verde-escuro){% else %}var(--terracota-escuro){% endif %}; font-weight: 600;">
+                                        {{ "%.2f"|format(item.ganho_peso) }} kg
+                                    </span>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td style="padding: 14px 20px; text-align: center;">
+                                {% if item.gmd is not none %}
+                                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background-color: {% if item.gmd >= 0.8 %}#E3F1E5{% else %}#FBEAE4{% endif %}; color: {% if item.gmd >= 0.8 %}var(--verde-escuro){% else %}var(--terracota-escuro){% endif %}; font-weight: 700;">
+                                        <span>{{ "%.3f"|format(item.gmd) }}</span>
+                                        <span>{% if item.gmd >= 0.8 %}✔{% else %}⚠{% endif %}</span>
+                                    </div>
+                                {% else %}
+                                    <span style="color: var(--texto-suave);">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 30px; color: var(--texto-suave);">
+                                Nenhuma pesagem registrada para este lote ainda. Vá na aba <strong>Pesagem</strong> para cadastrar os pesos.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div style="text-align: center; margin-top: 40px;">
+    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+</div>
+{% endblock %}
