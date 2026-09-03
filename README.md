@@ -2,6 +2,7 @@
 
 ## 📌 Sobre o Projeto
 O Sistema de Recria e Terminação Bovino é uma solução para o agronegócio focada no gerenciamento financeiro e zootécnico da pecuária de corte. O sistema resolve a falta de previsibilidade do produtor rural, permitindo o controle preciso do custo por arroba (@) produzida e ajudando a evitar a comercialização de lotes no prejuízo.
+[Clique aqui para ver o Pitch do Projeto (PDF)](./pitch_deck.pdf.pdf)
 
 ## 🚀 Funcionalidades Principais
 * Gestão de Lotes: Cadastro de lotes, datas e acompanhamento da fase atual.
