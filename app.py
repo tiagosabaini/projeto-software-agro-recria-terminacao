@@ -98,65 +98,61 @@ def despesas():
     conexao = conectar()
 
     if request.method == 'POST':
-        tipo_lancamento = request.form.get('tipo_lancamento')
-        lote_id = request.form.get('lote_id')
+        # Bloco Try/Finally garante que o banco SEMPRE será fechado, evitando travamento "database is locked"
+        try:
+            tipo_lancamento = request.form.get('tipo_lancamento')
+            lote_id = request.form.get('lote_id')
 
-        # Lançamento Simples
-        if tipo_lancamento == 'direto':
-            categoria = request.form.get('categoria')
-            valor = float(request.form.get('valor'))
-            obs = request.form.get('observacao', '')
-            conexao.execute(
-                'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
-                (lote_id, categoria, valor, obs)
-            )
+            # Lançamento Simples
+            if tipo_lancamento == 'direto':
+                categoria = request.form.get('categoria')
+                valor = float(request.form.get('valor'))
+                obs = request.form.get('observacao', '')
+                conexao.execute(
+                    'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
+                    (lote_id, categoria, valor, obs)
+                )
 
-        # Lançamento de Pastagem (Qtd Bois x Meses x Valor Mensal)
-        elif tipo_lancamento == 'pastagem':
-            qtd_bois = int(request.form.get('qtd_bois', 0))
-            meses = float(request.form.get('meses', 0))
-            valor_mes_cabeca = float(request.form.get('valor_mes_cabeca', 0))
-            valor_total = qtd_bois * meses * valor_mes_cabeca
-            obs = f"Pasto: {qtd_bois} cab. x {meses} meses x R$ {valor_mes_cabeca:.2f}/mês"
-            conexao.execute(
-                'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
-                (lote_id, 'Pastagem', valor_total, obs)
-            )
+            # Lançamento de Pastagem (Qtd Bois x Meses x Valor Mensal)
+            elif tipo_lancamento == 'pastagem':
+                qtd_bois = int(request.form.get('qtd_bois', 0))
+                meses = float(request.form.get('meses', 0))
+                valor_mes_cabeca = float(request.form.get('valor_mes_cabeca', 0))
+                valor_total = qtd_bois * meses * valor_mes_cabeca
+                obs = f"Pasto: {qtd_bois} cab. x {meses} meses x R$ {valor_mes_cabeca:.2f}/mês"
+                conexao.execute(
+                    'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
+                    (lote_id, 'Pastagem', valor_total, obs)
+                )
 
-        # Lançamento Nutrição/Sal (Fórmula exata do caderno do pai)
-        # Lançamento Nutrição/Sal (Calculado pela quantidade de sacos e dias de consumo)
-        elif tipo_lancamento == 'nutricao':
-            qtd_sacos = float(request.form.get('qtd_sacos', 0))
-            peso_saco_kg = float(request.form.get('peso_saco_kg', 25))
-            dias_consumo = float(request.form.get('dias_consumo', 1))
-            preco_saco = float(request.form.get('preco_saco', 0))
-            qtd_bois = int(request.form.get('qtd_bois_nutricao', 1))
-            valor_adicional = float(request.form.get('valor_adicional', 0)) # Ex: Ouro Fino
+            # Lançamento Financeiro (Compra de Sal/Proteinado)
+            elif tipo_lancamento == 'nutricao':
+                qtd_sacos = float(request.form.get('qtd_sacos', 0))
+                preco_saco = float(request.form.get('preco_saco', 0))
+                qtd_bois = int(request.form.get('qtd_bois_nutricao', 1))
+                valor_adicional = float(request.form.get('valor_adicional', 0))
 
-            # Lógica de cálculo:
-            # 1. Peso total de sal consumido em kg = qtd_sacos * peso_saco_kg
-            peso_total_kg = qtd_sacos * peso_saco_kg
+                # Cálculo financeiro puro (sem dias de consumo)
+                custo_total = (qtd_sacos * preco_saco) + valor_adicional
+                custo_por_cabeca = custo_total / qtd_bois if qtd_bois > 0 else 0
+
+                # Observação gravada no histórico
+                obs = f"Compra: {qtd_sacos} saco(s). Custo por cabeça: R$ {custo_por_cabeca:.2f} ({qtd_bois} bois)."
+                
+                conexao.execute(
+                    'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
+                    (lote_id, 'Sal/Proteinado', custo_total, obs)
+                )
+
+            conexao.commit()
+        except Exception as e:
+            print(f"Erro interno ao salvar despesa: {e}")
+        finally:
+            conexao.close()
             
-            # 2. Transformar em gramas e descobrir o consumo médio por dia por boi
-            # (peso_total * 1000g) / (dias_consumo * qtd_bois)
-            if dias_consumo > 0 and qtd_bois > 0:
-                gramas_dia_por_boi = (peso_total_kg * 1000) / (dias_consumo * qtd_bois)
-            else:
-                gramas_dia_por_boi = 0
-
-            # 3. Custo total do sal + adicional
-            custo_sal_total = (qtd_sacos * preco_saco) + valor_adicional
-
-            obs = f"Nutrição: {qtd_sacos} saco(s) de {peso_saco_kg}kg em {dias_consumo} dias ({qtd_bois} bois) (~{gramas_dia_por_boi:.0f}g/boi/dia)"
-            conexao.execute(
-                'INSERT INTO despesas (lote_id, categoria, valor, observacao) VALUES (?, ?, ?, ?)',
-                (lote_id, 'Sal/Proteinado', custo_sal_total, obs)
-            )
-
-        conexao.commit()
-        conexao.close()
         return redirect(url_for('despesas'))
 
+    # Método GET para exibir a tela
     lista_despesas = conexao.execute('''
         SELECT despesas.*, lotes.identificacao
         FROM despesas
@@ -227,56 +223,66 @@ def pesagem():
 
     return render_template('pesagem.html', pesagens=lista_pesagens, lotes=lista_lotes)
 
+
+
 @app.route('/gmd', methods=['GET', 'POST'])
 def gmd():
     conexao = conectar()
-    lote_selecionado = None
-    dados_gmd = []
     
-    # Lista de todos os lotes para o select
+    # Cria a tabela de consumo no banco de dados automaticamente se não existir
+    conexao.execute('''
+        CREATE TABLE IF NOT EXISTS consumo_sal (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lote_id INTEGER,
+            data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            qtd_sacos REAL,
+            peso_saco_kg REAL,
+            dias INTEGER,
+            qtd_bois INTEGER,
+            gramas_cab_dia REAL
+        )
+    ''')
+    conexao.commit()
+
+    lote_selecionado = None
+    historico_consumo = []
     lista_lotes = conexao.execute('SELECT * FROM lotes').fetchall()
 
-    if request.method == 'POST' or request.args.get('lote_id'):
-        # Permite receber tanto via POST (formulário) quanto GET (se o usuário alternar)
-        lote_id = request.form.get('lote_id') or request.args.get('lote_id')
-        
+    if request.method == 'POST':
+        lote_id = request.form.get('lote_id')
+        tipo_acao = request.form.get('tipo_acao')
+
+        # Se o formulário enviado for o de registrar novo consumo
+        if tipo_acao == 'registrar':
+            qtd_sacos = float(request.form.get('qtd_sacos', 0))
+            peso_saco_kg = float(request.form.get('peso_saco_kg', 25))
+            dias = int(request.form.get('dias', 1))
+            qtd_bois = int(request.form.get('qtd_bois', 1))
+
+            # Matemática: (Total de kg * 1000) / (dias * cabeças)
+            peso_total_kg = qtd_sacos * peso_saco_kg
+            if dias > 0 and qtd_bois > 0:
+                gramas_cab_dia = (peso_total_kg * 1000) / (dias * qtd_bois)
+            else:
+                gramas_cab_dia = 0
+
+            conexao.execute('''
+                INSERT INTO consumo_sal (lote_id, qtd_sacos, peso_saco_kg, dias, qtd_bois, gramas_cab_dia)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (lote_id, qtd_sacos, peso_saco_kg, dias, qtd_bois, gramas_cab_dia))
+            conexao.commit()
+            
+        # Busca os dados do lote para exibir na tela (tanto para visualização quanto após registro)
         if lote_id:
-            lote_id = int(lote_id)
-            lote_selecionado = conexao.execute('SELECT * FROM lotes WHERE id = ?', (lote_id,)).fetchone()
-            
-            # Pega todas as pesagens daquele lote específico ordenadas por data
-            pesagens_lote = conexao.execute('''
-                SELECT * FROM pesagens WHERE lote_id = ? ORDER BY data ASC
-            ''', (lote_id,)).fetchall()
-            
-            # Lógica de cálculo do GMD entre pesagens consecutivas
-            anterior = None
-            for p in pesagens_lote:
-                gmd_valor = None
-                dias = 0
-                ganho_peso = 0
-                
-                if anterior is not None:
-                    data_atual = datetime.strptime(p['data'], '%Y-%m-%d')
-                    data_anterior = datetime.strptime(anterior['data'], '%Y-%m-%d')
-                    dias = (data_atual - data_anterior).days
-                    
-                    if dias > 0:
-                        ganho_peso = p['peso'] - anterior['peso']
-                        gmd_valor = ganho_peso / dias
-                
-                dados_gmd.append({
-                    'id': p['id'],
-                    'data': p['data'],
-                    'peso': p['peso'],
-                    'dias_intervalo': dias,
-                    'ganho_peso': ganho_peso,
-                    'gmd': gmd_valor
-                })
-                anterior = p
+            lote_selecionado = conexao.execute('SELECT * FROM lotes WHERE id = ?', (int(lote_id),)).fetchone()
+            historico_consumo = conexao.execute('''
+                SELECT * FROM consumo_sal WHERE lote_id = ? ORDER BY id DESC
+            ''', (int(lote_id),)).fetchall()
 
     conexao.close()
-    return render_template('gmd.html', lotes=lista_lotes, lote_selecionado=lote_selecionado, dados_gmd=dados_gmd)
+    return render_template('gmd.html', lotes=lista_lotes, lote_selecionado=lote_selecionado, historico_consumo=historico_consumo)
+
+
 
 @app.route('/registrar_venda', methods=['POST'])
 def registrar_venda():

@@ -77,9 +77,12 @@
     </form>
 </div>
 
-<!-- Form 3: Calculadora de Sal/Proteinado -->
+<!-- Form 3: Compra de Sal/Proteinado (Financeiro) -->
 <div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 40px;">
-    <h3>3. Calculadora de Sal Mineral e Proteinado (Caderno)</h3>
+    <h3>3. Compra de Sal/Proteinado (Custo Financeiro)</h3>
+    <p style="font-size: 0.9rem; color: var(--texto-suave); margin-bottom: 20px;">
+        Lance o valor gasto com suplementação. O sistema calculará o custo exato por cabeça.
+    </p>
     <form action="{{ url_for('despesas') }}" method="POST">
         <input type="hidden" name="tipo_lancamento" value="nutricao">
         
@@ -95,35 +98,27 @@
 
         <div class="form-linha">
             <div class="campo">
-                <label>Consumo diário por boi (g)</label>
-                <input type="number" name="gramas_dia" placeholder="Ex: 150" required>
+                <label>Qtd de Sacos Comprados/Destinados</label>
+                <input type="number" step="0.1" name="qtd_sacos" placeholder="Ex: 50" required>
             </div>
             <div class="campo">
-                <label>Tempo (Meses)</label>
-                <input type="number" step="0.1" name="meses_nutricao" placeholder="Ex: 13" required>
-            </div>
-            <div class="campo">
-                <label>Peso do Saco (kg)</label>
-                <input type="number" name="peso_saco_kg" value="25" required>
+                <label>Preço Unitário do Saco (R$)</label>
+                <input type="number" step="0.01" name="preco_saco" placeholder="Ex: 96.00" required>
             </div>
         </div>
 
         <div class="form-linha" style="margin-top: 15px;">
             <div class="campo">
-                <label>Preço do Saco (R$)</label>
-                <input type="number" step="0.01" name="preco_saco" placeholder="Ex: 96.00" required>
+                <label>Quantidade de Bois no Lote</label>
+                <input type="number" name="qtd_bois_nutricao" placeholder="Ex: 36" required>
             </div>
             <div class="campo">
-                <label>Quantidade de Bois</label>
-                <input type="number" name="qtd_bois_nutricao" placeholder="Ex: 13" required>
-            </div>
-            <div class="campo">
-                <label>Adicional (Ex: SuperGold) R$</label>
+                <label>Adicional (Frete/Mistura) R$</label>
                 <input type="number" step="0.01" name="valor_adicional" value="0">
             </div>
         </div>
 
-        <button type="submit" style="margin-top: 15px; width: 100%;">Calcular Nutrição e Lançar</button>
+        <button type="submit" style="margin-top: 15px; width: 100%;">Registrar Custo no Lote</button>
     </form>
 </div>
 

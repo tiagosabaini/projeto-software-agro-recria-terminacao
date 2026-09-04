@@ -1,90 +1,99 @@
 {% extends "base.html" %}
 
-{% block titulo %}Cálculo de GMD{% endblock %}
+{% block titulo %}Consumo de Sal{% endblock %}
 
 {% block conteudo %}
 <div style="text-align: center; margin-bottom: 32px;">
-    <h2>Cálculo de Ganho Médio Diário (GMD)</h2>
-    <p style="color: var(--texto-suave);">Selecione um lote para acompanhar a evolução de peso e o desempenho nutricional dos animais ao longo do tempo.</p>
+    <h2>Controle de Consumo de Cocho</h2>
+    <p style="color: var(--texto-suave);">Calcule e acompanhe as gramas diárias consumidas por animal.</p>
 </div>
 
-<!-- Seletor de Lote -->
-<form action="{{ url_for('gmd') }}" method="POST" class="form-caixa form-linha" style="max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 32px;">
-    <div class="campo" style="flex: 3;">
-        <label for="lote_id">Selecione o Lote</label>
-        <select name="lote_id" id="lote_id" required>
-            <option value="">Escolha um lote...</option>
-            {% for lote in lotes %}
-            <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
-                {{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)
-            </option>
-            {% endfor %}
-        </select>
-    </div>
-    <div style="flex: 1; display: flex; align-items: flex-end;">
-        <button type="submit" style="width: 100%; margin-top: 0; height: 48px;">Analisar</button>
-    </div>
-</form>
+<!-- Módulo Superior: Seletor e Calculadora -->
+<div class="form-caixa" style="max-width: 850px; margin-left: auto; margin-right: auto; margin-bottom: 32px; background: linear-gradient(145deg, #ffffff, #f9fbf9); border: 1.5px solid var(--verde-salvia);">
+    
+    <!-- Parte 1: Selecionar o Lote para ver o histórico -->
+    <h3 style="margin-bottom: 15px; color: var(--verde-escuro);">1. Visualizar Histórico do Lote</h3>
+    <form action="{{ url_for('gmd') }}" method="POST" class="form-linha" style="border-bottom: 1px dashed var(--borda); padding-bottom: 20px; margin-bottom: 20px;">
+        <input type="hidden" name="tipo_acao" value="visualizar">
+        <div class="campo" style="flex: 3;">
+            <select name="lote_id" required>
+                <option value="">Escolha um lote...</option>
+                {% for lote in lotes %}
+                <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
+                    {{ lote.identificacao }} ({{ lote.qtd_cabecas or 0 }} cab.)
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <button type="submit" style="width: 100%; height: 48px; margin-top: 0; background-color: #E2DDD0; color: #2D2D2A;">Buscar Lote</button>
+        </div>
+    </form>
 
+    <!-- Parte 2: Lançar novo consumo (Aparece se um lote estiver selecionado) -->
+    {% if lote_selecionado %}
+    <h3 style="margin-bottom: 15px; color: var(--verde-escuro);">2. Registrar Novo Trato ({{ lote_selecionado.identificacao }})</h3>
+    <form action="{{ url_for('gmd') }}" method="POST">
+        <input type="hidden" name="tipo_acao" value="registrar">
+        <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+        
+        <div class="form-linha">
+            <div class="campo">
+                <label>Qtd Sacos no Cocho</label>
+                <input type="number" step="0.1" name="qtd_sacos" placeholder="Ex: 5" required>
+            </div>
+            <div class="campo">
+                <label>Peso do Saco (kg)</label>
+                <input type="number" name="peso_saco_kg" value="25" required>
+            </div>
+            <div class="campo">
+                <label>Durou Quantos Dias?</label>
+                <input type="number" name="dias" placeholder="Ex: 15" required>
+            </div>
+            <div class="campo">
+                <label>Qtd de Bois</label>
+                <input type="number" name="qtd_bois" value="{{ lote_selecionado.qtd_cabecas or 0 }}" required>
+            </div>
+        </div>
+        <button type="submit" style="width: 100%; margin-top: 10px;">Calcular e Salvar Consumo</button>
+    </form>
+    {% endif %}
+</div>
+
+<!-- Tabela de Histórico de Consumo -->
 {% if lote_selecionado %}
-    <!-- Resumo do Lote Selecionado -->
-    <div class="form-caixa" style="max-width: 700px; margin-left: auto; margin-right: auto; text-align: center; padding: 24px; margin-bottom: 32px;">
-        <h3 style="margin-bottom: 6px;">{{ lote_selecionado.identificacao }}</h3>
-        <p style="color: var(--texto-suave); margin: 0;">
-            Categoria: <strong>{{ lote_selecionado.categoria_animal or '—' }}</strong> | 
-            Fase: <strong>{{ lote_selecionado.fase_atual }}</strong> | 
-            Cabeças: <strong>{{ lote_selecionado.qtd_cabecas or 0 }}</strong>
-        </p>
-    </div>
-
-    <!-- Tabela de Histórico de GMD -->
     <div style="max-width: 850px; margin: 0 auto;">
-        <h3 style="text-align: center; margin-bottom: 20px; font-size: 1.2rem; color: var(--verde-escuro);">Evolução e Desempenho (GMD)</h3>
+        <h3 style="text-align: center; margin-bottom: 20px;">Histórico de Desempenho (Gramas/Dia)</h3>
         
         <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
             <div style="overflow-x: auto;">
                 <table style="margin: 0; box-shadow: none; border-radius: 0;">
                     <thead>
                         <tr style="background-color: #F4F6F4;">
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Data da Pesagem</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Peso Registrado</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Dias entre Pesagens</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Ganho no Período</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px; text-align: center;">GMD (kg/dia)</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Data do Registro</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Detalhes do Trato</th>
+                            <th style="color: var(--verde-escuro); padding: 14px 20px; text-align: center;">Consumo Diário</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in dados_gmd %}
+                        {% for item in historico_consumo %}
                         <tr>
-                            <td style="padding: 14px 20px; font-weight: 600;">{{ item.data | data_br }}</td>
-                            <td style="padding: 14px 20px;">{{ "%.2f"|format(item.peso) }} kg</td>
-                            <td style="padding: 14px 20px; color: var(--texto-suave);">
-                                {% if item.dias_intervalo > 0 %} {{ item.dias_intervalo }} dias {% else %} — (Primeira Pesagem) {% endif %}
+                            <td style="padding: 14px 20px; font-weight: 600; color: var(--texto-suave);">
+                                {{ item.data_registro[:10] | data_br }}
                             </td>
-                            <td style="padding: 14px 20px;">
-                                {% if item.dias_intervalo > 0 %}
-                                    <span style="color: {% if item.ganho_peso >= 0 %}var(--verde-escuro){% else %}var(--terracota-escuro){% endif %}; font-weight: 600;">
-                                        {{ "%.2f"|format(item.ganho_peso) }} kg
-                                    </span>
-                                {% else %}
-                                    —
-                                {% endif %}
+                            <td style="padding: 14px 20px; color: var(--texto-suave); font-size: 0.95rem;">
+                                {{ item.qtd_sacos }} saco(s) de {{ item.peso_saco_kg }}kg para {{ item.qtd_bois }} cabeças (Duração: {{ item.dias }} dias).
                             </td>
                             <td style="padding: 14px 20px; text-align: center;">
-                                {% if item.gmd is not none %}
-                                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 12px; background-color: {% if item.gmd >= 0.8 %}#E3F1E5{% else %}#FBEAE4{% endif %}; color: {% if item.gmd >= 0.8 %}var(--verde-escuro){% else %}var(--terracota-escuro){% endif %}; font-weight: 700;">
-                                        <span>{{ "%.3f"|format(item.gmd) }}</span>
-                                        <span>{% if item.gmd >= 0.8 %}✔{% else %}⚠{% endif %}</span>
-                                    </div>
-                                {% else %}
-                                    <span style="color: var(--texto-suave);">—</span>
-                                {% endif %}
+                                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 12px; background-color: #E3F1E5; color: var(--verde-escuro); font-weight: 700; font-size: 1.1rem;">
+                                    {{ "%.0f"|format(item.gramas_cab_dia) }} g/cab/dia
+                                </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="5" style="text-align: center; padding: 30px; color: var(--texto-suave);">
-                                Nenhuma pesagem registrada para este lote ainda. Vá na aba <strong>Pesagem</strong> para cadastrar os pesos.
+                            <td colspan="3" style="text-align: center; padding: 30px; color: var(--texto-suave);">
+                                Nenhum registro de consumo para este lote ainda.
                             </td>
                         </tr>
                         {% endfor %}
