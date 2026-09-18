@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="container-inicio">
+        <br>
         <h1>Sistema de Gestão de Lotes</h1>
         <p class="subtitulo">Bem-vindo ao sistema de controle de recria e terminação.</p>
 
@@ -17,27 +18,28 @@
                 <h3>Cadastro de Lote</h3>
                 <p>Registrar um novo lote de recria ou terminação.</p>
             </a>
-
             <a href="{{ url_for('despesas') }}" class="card-menu">
                 <span class="icone">💰</span>
                 <h3>Despesas</h3>
-                <p>Lançar e consultar gastos com ração, sal e água.</p>
+                <p>Lançar e consultar gastos com pasto, sal e sanidade.</p>
             </a>
-
-            <a href="{{ url_for('painel') }}" class="card-menu">
-                <span class="icone">📊</span>
-                <h3>Painel Financeiro</h3>
-                <p>Custo por arroba e viabilidade do lote.</p>
-            </a>
-
             <a href="{{ url_for('pesagem') }}" class="card-menu">
                 <span class="icone">⚖️</span>
                 <h3>Pesagem</h3>
                 <p>Acompanhar ganho de peso diário (GMD).</p>
             </a>
+            <a href="{{ url_for('consumo_cocho') }}" class="card-menu">
+                <span class="icone">🌾</span>
+                <h3>Consumo de Cocho</h3>
+                <p>Controle do trato e suplementação mineral em gramas/dia.</p>
+            </a>
+            <a href="{{ url_for('painel') }}" class="card-menu">
+                <span class="icone">📊</span>
+                <h3>Painel Financeiro</h3>
+                <p>Custo por cabeça, viabilidade do lote e resultado final.</p>
+            </a>
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

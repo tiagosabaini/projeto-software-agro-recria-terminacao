@@ -1,11 +1,9 @@
 {% extends "base.html" %}
-
 {% block titulo %}Lotes Cadastrados{% endblock %}
-
 {% block conteudo %}
 <h2>Lotes Cadastrados</h2>
 
-<div style="overflow-x: auto;">
+<div style="overflow-x: auto; width: 100%;">
     <table>
         <thead>
             <tr>
@@ -32,18 +30,14 @@
                     {% endif %}
                 </td>
                 <td>
-                    <!-- Aqui está a modificação para deixar os botões na mesma altura e alinhados -->
-                    <div style="display: flex; gap: 8px; align-items: stretch;">
+                    <!-- Refatorado para CSS limpo -->
+                    <div class="grupo-botoes-tabela">
+                        <a class="botao btn-tabela" href="{{ url_for('painel', lote_id=lote.id) }}">Painel</a>
+                        <a class="botao btn-tabela-secundario" href="{{ url_for('editar_lote', id=lote.id) }}">Atualizar</a>
                         
-                        <a class="botao" style="padding: 0 16px; font-size: 0.9rem; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;" href="{{ url_for('painel', lote_id=lote.id) }}">Painel</a>
-                        
-                        <a class="botao" style="background-color: #E2DDD0; color: #2D2D2A; padding: 0 16px; font-size: 0.9rem; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;" href="{{ url_for('editar_lote', id=lote.id) }}">Atualizar</a>
-                        
-                        <!-- Formulário e Botão de Exclusão -->
-                        <form action="{{ url_for('excluir_lote', id=lote.id) }}" method="POST" style="margin: 0; display: flex;" onsubmit="return confirm('ATENÇÃO: Tem certeza que deseja excluir o lote \'{{ lote.identificacao }}\'?\n\nTodas as despesas e pesagens associadas a ele também serão apagadas para sempre.');">
-                            <button type="submit" class="excluir" style="padding: 0 16px; font-size: 0.9rem; border-radius: 999px; height: 36px; margin: 0; display: inline-flex; align-items: center; justify-content: center;">Excluir</button>
+                        <form action="{{ url_for('excluir_lote', id=lote.id) }}" method="POST" class="form-excluir" onsubmit="return confirm('ATENÇÃO: Tem certeza que deseja excluir o lote \'{{ lote.identificacao }}\'?\n\nTodas as despesas e pesagens associadas a ele também serão apagadas para sempre.');">
+                            <button type="submit" class="excluir btn-tabela-excluir">Excluir</button>
                         </form>
-
                     </div>
                 </td>
             </tr>
@@ -55,6 +49,5 @@
         </tbody>
     </table>
 </div>
-
 <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
 {% endblock %}

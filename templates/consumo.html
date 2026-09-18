@@ -1,19 +1,14 @@
 {% extends "base.html" %}
-
 {% block titulo %}Consumo de Sal{% endblock %}
-
 {% block conteudo %}
 <div style="text-align: center; margin-bottom: 32px;">
     <h2>Controle de Consumo de Cocho</h2>
     <p style="color: var(--texto-suave);">Calcule e acompanhe as gramas diárias consumidas por animal.</p>
 </div>
 
-<!-- Módulo Superior: Seletor e Calculadora -->
 <div class="form-caixa" style="max-width: 850px; margin-left: auto; margin-right: auto; margin-bottom: 32px; background: linear-gradient(145deg, #ffffff, #f9fbf9); border: 1.5px solid var(--verde-salvia);">
-    
-    <!-- Parte 1: Selecionar o Lote para ver o histórico -->
     <h3 style="margin-bottom: 15px; color: var(--verde-escuro);">1. Visualizar Histórico do Lote</h3>
-    <form action="{{ url_for('gmd') }}" method="POST" class="form-linha" style="border-bottom: 1px dashed var(--borda); padding-bottom: 20px; margin-bottom: 20px;">
+    <form action="{{ url_for('consumo_cocho') }}" method="POST" class="form-linha" style="border-bottom: 1px dashed var(--borda); padding-bottom: 20px; margin-bottom: 20px;">
         <input type="hidden" name="tipo_acao" value="visualizar">
         <div class="campo" style="flex: 3;">
             <select name="lote_id" required>
@@ -30,10 +25,9 @@
         </div>
     </form>
 
-    <!-- Parte 2: Lançar novo consumo (Aparece se um lote estiver selecionado) -->
     {% if lote_selecionado %}
     <h3 style="margin-bottom: 15px; color: var(--verde-escuro);">2. Registrar Novo Trato ({{ lote_selecionado.identificacao }})</h3>
-    <form action="{{ url_for('gmd') }}" method="POST">
+    <form action="{{ url_for('consumo_cocho') }}" method="POST">
         <input type="hidden" name="tipo_acao" value="registrar">
         <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
         
@@ -60,11 +54,9 @@
     {% endif %}
 </div>
 
-<!-- Tabela de Histórico de Consumo -->
 {% if lote_selecionado %}
-    <div style="max-width: 850px; margin: 0 auto;">
+    <div style="max-width: 850px; margin: 0 auto; width: 100%;">
         <h3 style="text-align: center; margin-bottom: 20px;">Histórico de Desempenho (Gramas/Dia)</h3>
-        
         <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
             <div style="overflow-x: auto;">
                 <table style="margin: 0; box-shadow: none; border-radius: 0;">
@@ -103,7 +95,6 @@
         </div>
     </div>
 {% endif %}
-
 <div style="text-align: center; margin-top: 40px;">
     <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
 </div>

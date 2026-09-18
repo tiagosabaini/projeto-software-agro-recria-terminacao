@@ -11,7 +11,7 @@
         <select name="lote_id" id="lote_id" required>
             <option value="">Selecione um lote</option>
             {% for lote in lotes %}
-            <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
+            <option value="{{ lote.id }}" {% if lote_selecionado and lote.id==lote_selecionado.id %}selected{% endif %}>
                 {{ lote.identificacao }} ({{ lote.status }})
             </option>
             {% endfor %}
@@ -23,158 +23,209 @@
 
 {% if lote_selecionado %}
 
-    <!-- Resumo de Custos Atuais (Aparece para todos) -->
-    <div class="form-caixa" style="text-align: center; padding: 32px 20px;">
-        <h3 style="margin-bottom: 8px; font-size: 1.5rem;">{{ lote_selecionado.identificacao }}</h3>
-        <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 1rem;">
-            Cabeças: <strong>{{ lote_selecionado.qtd_cabecas or 0 }}</strong> | 
-            Status: <strong>{{ lote_selecionado.status }}</strong>
+<!-- Resumo de Custos Atuais (Aparece para todos) -->
+<div class="form-caixa" style="text-align: center; padding: 32px 20px;">
+    <h3 style="margin-bottom: 8px; font-size: 1.5rem;">{{ lote_selecionado.identificacao }}</h3>
+    <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 1rem;">
+        Cabeças: <strong>{{ lote_selecionado.qtd_cabecas or 0 }}</strong> |
+        Status: <strong>{{ lote_selecionado.status }}</strong>
+    </p>
+    <div style="background-color: var(--creme); padding: 20px; border-radius: var(--raio); border: 1px solid var(--borda); display: inline-block; min-width: 60%;">
+        <span style="font-size: 0.95rem; color: var(--texto-suave); font-weight: 600;">Custo Total Acumulado (Compra + Despesas)</span><br>
+        <strong style="font-size: 1.5rem; color: var(--terracota-escuro); display: block; margin-top: 8px;">
+            R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}
+        </strong>
+    </div>
+</div>
+
+{% if lote_selecionado.status == 'Em Andamento' %}
+
+<!-- MÓDULO DE SIMULAÇÃO HARMONIZADO COM INTEGRAÇÃO DE API -->
+<div class="form-caixa" style="background: linear-gradient(145deg, #ffffff, #f9fbf9); border: 2px solid var(--verde-salvia); box-shadow: 0 8px 24px rgba(143, 185, 155, 0.15);">
+    <div style="text-align: center; margin-bottom: 32px;">
+        <span style="font-size: 2.2rem; display: block; margin-bottom: 12px;">📊</span>
+        <h3 style="margin-bottom: 12px; color: var(--verde-escuro); font-size: 1.4rem;">Simulador de Venda (Mercado Interno e Exportação)</h3>
+        <p style="font-size: 0.95rem; color: var(--texto-suave); margin: 0; line-height: 1.5;">
+            Teste diferentes pesos e preços para descobrir a viabilidade do lote.
         </p>
-        <div style="background-color: var(--creme); padding: 20px; border-radius: var(--raio); border: 1px solid var(--borda); display: inline-block; min-width: 60%;">
-            <span style="font-size: 0.95rem; color: var(--texto-suave); font-weight: 600;">Custo Total Acumulado (Compra + Despesas)</span><br>
-            <strong style="font-size: 1.5rem; color: var(--terracota-escuro); display: block; margin-top: 8px;">
-                R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}
-            </strong>
+
+        <!-- Badge da API -->
+        <div id="api_status" style="margin-top: 15px; display: inline-block; background-color: var(--creme); color: var(--texto-suave); padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; border: 1px solid var(--borda);">
+            🔄 Conectando com a API de Câmbio em tempo real...
         </div>
     </div>
 
+    <div class="form-linha" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px dashed var(--borda);">
+        <div class="campo">
+            <label>Média Estimada de Arrobas (@) por Boi</label>
+            <input type="number" id="sim_arroba_boi" step="0.1" placeholder="Ex: 21.5" oninput="calcularSimulacao()" style="background-color: var(--branco);">
+        </div>
+        <div class="campo">
+            <label>Preço da Arroba Hoje (R$)</label>
+            <input type="number" id="sim_preco_arroba" step="0.01" placeholder="Ex: 280.00" oninput="calcularSimulacao()" style="background-color: var(--branco);">
+        </div>
+    </div>
 
-    {% if lote_selecionado.status == 'Em Andamento' %}
-        
-        <!-- MÓDULO DE SIMULAÇÃO HARMONIZADO -->
-        <div class="form-caixa" style="background: linear-gradient(145deg, #ffffff, #f9fbf9); border: 2px solid var(--verde-salvia); box-shadow: 0 8px 24px rgba(143, 185, 155, 0.15);">
-            <div style="text-align: center; margin-bottom: 32px;">
-                <span style="font-size: 2.2rem; display: block; margin-bottom: 12px;">📊</span>
-                <h3 style="margin-bottom: 12px; color: var(--verde-escuro); font-size: 1.4rem;">Simulador de Venda</h3>
-                <p style="font-size: 0.95rem; color: var(--texto-suave); margin: 0; line-height: 1.5;">
-                    Teste diferentes pesos e preços da arroba para descobrir o lucro estimado. <br>
-                    <em>Estes dados são apenas simulações e não serão salvos.</em>
-                </p>
-            </div>
-            
-            <div class="form-linha" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px dashed var(--borda);">
-                <div class="campo">
-                    <label>Média Estimada de Arrobas (@) por Boi</label>
-                    <input type="number" id="sim_arroba_boi" step="0.1" placeholder="Ex: 21.5" oninput="calcularSimulacao()" style="background-color: var(--branco);">
-                </div>
-                <div class="campo">
-                    <label>Preço da Arroba Hoje (R$)</label>
-                    <input type="number" id="sim_preco_arroba" step="0.01" placeholder="Ex: 280.00" oninput="calcularSimulacao()" style="background-color: var(--branco);">
-                </div>
-            </div>
-            
-            <!-- Área de Resultados do Simulador -->
-            <div style="background-color: var(--creme); padding: 24px; border-radius: var(--raio-peq); border: 1px solid var(--borda);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <span style="color: var(--texto-suave); font-weight: 600;">Total de Arrobas Esperado:</span>
-                    <strong style="font-size: 1.1rem; color: var(--texto);"><span id="res_total_arrobas">0.00</span> @</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <span style="color: var(--texto-suave); font-weight: 600;">Receita Bruta Estimada:</span>
-                    <strong style="font-size: 1.1rem; color: var(--texto);">R$ <span id="res_receita">0.00</span></strong>
-                </div>
-                
-                <div style="background-color: var(--branco); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--verde-salvia);">
-                    <span style="font-weight: 700; color: var(--verde-escuro); font-size: 1.1rem;">Lucro Líquido Estimado:</span>
-                    <strong id="res_lucro" style="font-size: 1.6rem; color: var(--texto);">R$ 0.00</strong>
-                </div>
-            </div>
+    <!-- Área de Resultados do Simulador -->
+    <div style="background-color: var(--creme); padding: 24px; border-radius: var(--raio-peq); border: 1px solid var(--borda);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="color: var(--texto-suave); font-weight: 600;">Total de Arrobas Esperado:</span>
+            <strong style="font-size: 1.1rem; color: var(--texto);"><span id="res_total_arrobas">0.00</span> @</strong>
         </div>
 
-        <script>
-            function calcularSimulacao() {
-                const qtdCabecas = {{ lote_selecionado.qtd_cabecas or 1 }};
-                const custoTotal = {{ balanco.custo_total_operacao or 0 }};
-                
-                const arrobaPorBoi = parseFloat(document.getElementById('sim_arroba_boi').value) || 0;
-                const precoArroba = parseFloat(document.getElementById('sim_preco_arroba').value) || 0;
-                
-                const totalArrobas = arrobaPorBoi * qtdCabecas;
-                const receita = totalArrobas * precoArroba;
-                const lucro = receita - custoTotal;
-                
-                document.getElementById('res_total_arrobas').innerText = totalArrobas.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('res_receita').innerText = receita.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                
-                const elLucro = document.getElementById('res_lucro');
-                elLucro.innerText = "R$ " + lucro.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                
-                if(lucro > 0) {
-                    elLucro.style.color = "#3F6650"; // Verde (Lucro)
-                } else if (lucro < 0) {
-                    elLucro.style.color = "#A65D45"; // Vermelho (Prejuízo)
-                } else {
-                    elLucro.style.color = "var(--texto)";
-                }
-            }
-        </script>
-
-        <!-- FECHAMENTO DEFINITIVO HARMONIZADO -->
-        <div class="form-caixa" style="margin-top: 40px;">
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h3 style="margin-bottom: 8px;">Registrar Venda (Fechamento Definitivo)</h3>
-                <p style="font-size: 0.95rem; color: var(--texto-suave);">
-                    Use os dados reais da nota oficial do frigorífico para fechar este lote. <br>
-                    <strong>Atenção:</strong> Esta ação moverá o lote para "Finalizado".
-                </p>
-            </div>
-            
-            <form action="{{ url_for('registrar_venda') }}" method="POST" class="form-linha">
-                <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
-                
-                <div class="campo">
-                    <label>Total de Arrobas Real (@)</label>
-                    <input type="number" step="0.01" name="total_arrobas_vendidas" required>
-                </div>
-
-                <div class="campo">
-                    <label>Valor Total Recebido (R$)</label>
-                    <input type="number" step="0.01" name="valor_venda_total" required>
-                </div>
-
-                <button type="submit" style="margin-top: 15px;">Finalizar Lote</button>
-            </form>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="color: var(--texto-suave); font-weight: 600;">Receita Bruta Estimada:</span>
+            <strong style="font-size: 1.1rem; color: var(--texto);">R$ <span id="res_receita">0.00</span></strong>
         </div>
 
-    {% else %}
-        
-        <!-- MÓDULO DE RESULTADO FINAL (Exclusivo para lotes já vendidos) -->
-        <div class="painel-comparativo">
-            <div class="card">
-                <h4>(+) Receita da Venda</h4>
-                <p><strong>Total Recebido:</strong> <span>R$ {{ "%.2f"|format(balanco.receita_venda or 0) }}</span></p>
-                <p><strong>Arrobas Vendidas:</strong> <span>{{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas or 0) }} @</span></p>
-                <p><strong>Média por Boi:</strong> <span>{{ "%.2f"|format((lote_selecionado.total_arrobas_vendidas or 0) / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</span></p>
-            </div>
-
-            <div class="card">
-                <h4>(-) Custos do Ciclo</h4>
-                <p><strong>Compra de Animais:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_compra_bezerros or 0) }}</span></p>
-                <p><strong>Despesas (Pasto + Sal + Insumos):</strong> <span>R$ {{ "%.2f"|format(balanco.custo_despesas or 0) }}</span></p>
-                <p><strong>Custo Total:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}</span></p>
-            </div>
+        <!-- Nova Linha: Conversão da API -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <span style="color: var(--verde-escuro); font-weight: 600;">🌍 Receita em Dólar (Exportação):</span>
+            <strong style="font-size: 1.1rem; color: var(--verde-escuro);" id="res_receita_dolar">US$ 0.00</strong>
         </div>
 
-        {% if balanco.sobra_liquida >= 0 %}
-            <div class="alerta-verde" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
-                <div>
-                    <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">✔</span>
-                    <strong>Lucro Líquido Real: R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
-                    <br>
-                    <span style="font-size: 0.95rem; font-weight: normal; color: var(--verde-escuro);">Sobra final após pagar o investimento inicial e o custo do ciclo.</span>
-                </div>
-            </div>
-        {% else %}
-            <div class="alerta-vermelho" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
-                <div>
-                    <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">⚠</span>
-                    <strong>Resultado Negativo (Prejuízo): R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
-                </div>
-            </div>
-        {% endif %}
-        
-    {% endif %}
-    
+        <div style="background-color: var(--branco); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--verde-salvia);">
+            <span style="font-weight: 700; color: var(--verde-escuro); font-size: 1.1rem;">Lucro Líquido Real Estimado:</span>
+            <strong id="res_lucro" style="font-size: 1.6rem; color: var(--texto);">R$ 0.00</strong>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Variável global para guardar o Dólar
+    let valorDolarAPI = 0;
+
+    // 2. Função assíncrona que consome a API da AwesomeAPI
+    async function consumirAPI() {
+        try {
+            const resposta = await fetch('https://economia.awesomeapi.com.br/last/USD-BRL');
+            const dados = await resposta.json();
+            valorDolarAPI = parseFloat(dados.USDBRL.bid);
+
+            // Altera o visual do badge avisando que a API deu certo
+            const badge = document.getElementById('api_status');
+            badge.innerHTML = `🌍 <strong>API Ativa:</strong> Dólar Comercial hoje a R$ ${valorDolarAPI.toFixed(2).replace('.', ',')}`;
+            badge.style.backgroundColor = '#E3F1E5';
+            badge.style.color = 'var(--verde-escuro)';
+            badge.style.border = 'none';
+
+            calcularSimulacao(); // Recalcula se o usuário já tiver digitado algo
+        } catch (erro) {
+            console.error("Erro na API:", erro);
+            const badge = document.getElementById('api_status');
+            badge.innerHTML = `⚠️ Erro ao conectar na API de câmbio.`;
+            badge.style.backgroundColor = '#FBEAE4';
+            badge.style.color = 'var(--terracota-escuro)';
+        }
+    }
+
+    // 3. Aciona a API imediatamente ao carregar a página
+    consumirAPI();
+
+    // 4. Lógica de cálculo do Simulador
+    function calcularSimulacao() {
+        // Linhas corrigidas, sem quebra de chaves do Jinja2
+        const qtdCabecas = {{ lote_selecionado.qtd_cabecas or 1 }};
+        const custoTotal = {{ balanco.custo_total_operacao or 0 }};
+
+        const arrobaPorBoi = parseFloat(document.getElementById('sim_arroba_boi').value) || 0;
+        const precoArroba = parseFloat(document.getElementById('sim_preco_arroba').value) || 0;
+
+        const totalArrobas = arrobaPorBoi * qtdCabecas;
+        const receita = totalArrobas * precoArroba;
+        const lucro = receita - custoTotal;
+
+        document.getElementById('res_total_arrobas').innerText = totalArrobas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        document.getElementById('res_receita').innerText = receita.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        const elLucro = document.getElementById('res_lucro');
+        elLucro.innerText = "R$ " + lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        if (lucro > 0) {
+            elLucro.style.color = "#3F6650";
+        } else if (lucro < 0) {
+            elLucro.style.color = "#A65D45";
+        } else {
+            elLucro.style.color = "var(--texto)";
+        }
+
+        // Cálculo integrado da API (Reais para Dólar)
+        const elReceitaDolar = document.getElementById('res_receita_dolar');
+        if (valorDolarAPI > 0 && receita > 0) {
+            const receitaDolar = receita / valorDolarAPI;
+            elReceitaDolar.innerText = `US$ ${receitaDolar.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        } else {
+            elReceitaDolar.innerText = "US$ 0.00";
+        }
+    }
+</script>
+
+<!-- FECHAMENTO DEFINITIVO HARMONIZADO -->
+<div class="form-caixa" style="margin-top: 40px;">
+    <div style="text-align: center; margin-bottom: 24px;">
+        <h3 style="margin-bottom: 8px;">Registrar Venda (Fechamento Definitivo)</h3>
+        <p style="font-size: 0.95rem; color: var(--texto-suave);">
+            Use os dados reais da nota oficial do frigorífico para fechar este lote. <br>
+            <strong>Atenção:</strong> Esta ação moverá o lote para "Finalizado".
+        </p>
+    </div>
+
+    <form action="{{ url_for('registrar_venda') }}" method="POST" class="form-linha">
+        <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+
+        <div class="campo">
+            <label>Total de Arrobas Real (@)</label>
+            <input type="number" step="0.01" name="total_arrobas_vendidas" required>
+        </div>
+
+        <div class="campo">
+            <label>Valor Total Recebido (R$)</label>
+            <input type="number" step="0.01" name="valor_venda_total" required>
+        </div>
+
+        <button type="submit" style="margin-top: 15px;">Finalizar Lote</button>
+    </form>
+</div>
+
+{% else %}
+
+<!-- MÓDULO DE RESULTADO FINAL (Exclusivo para lotes já vendidos) -->
+<div class="painel-comparativo">
+    <div class="card">
+        <h4>(+) Receita da Venda</h4>
+        <p><strong>Total Recebido:</strong> <span>R$ {{ "%.2f"|format(balanco.receita_venda or 0) }}</span></p>
+        <p><strong>Arrobas Vendidas:</strong> <span>{{ "%.2f"|format(lote_selecionado.total_arrobas_vendidas or 0) }} @</span></p>
+        <p><strong>Média por Boi:</strong> <span>{{ "%.2f"|format((lote_selecionado.total_arrobas_vendidas or 0) / (lote_selecionado.qtd_cabecas or 1)) }} @/cab</span></p>
+    </div>
+
+    <div class="card">
+        <h4>(-) Custos do Ciclo</h4>
+        <p><strong>Compra de Animais:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_compra_bezerros or 0) }}</span></p>
+        <p><strong>Despesas (Pasto + Sal + Insumos):</strong> <span>R$ {{ "%.2f"|format(balanco.custo_despesas or 0) }}</span></p>
+        <p><strong>Custo Total:</strong> <span>R$ {{ "%.2f"|format(balanco.custo_total_operacao or 0) }}</span></p>
+    </div>
+</div>
+
+{% if balanco.sobra_liquida >= 0 %}
+<div class="alerta-verde" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
+    <div>
+        <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">✔</span>
+        <strong>Lucro Líquido Real: R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
+        <br>
+        <span style="font-size: 0.95rem; font-weight: normal; color: var(--verde-escuro);">Sobra final após pagar o investimento inicial e o custo do ciclo.</span>
+    </div>
+</div>
+{% else %}
+<div class="alerta-vermelho" style="justify-content: center; text-align: center; font-size: 1.1rem; padding: 24px;">
+    <div>
+        <span style="font-size: 1.5rem; display: block; margin-bottom: 8px;">⚠</span>
+        <strong>Resultado Negativo (Prejuízo): R$ {{ "%.2f"|format(balanco.sobra_liquida or 0) }}</strong>
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+
 {% endif %}
 
 <div style="text-align: center; margin-top: 24px;">

@@ -122,47 +122,33 @@
     </form>
 </div>
 
-<!-- Tabela de Histórico de Despesas -->
-<div style="max-width: 850px; margin: 0 auto;">
-    <h3 style="text-align: center; margin-bottom: 20px;">Histórico de Despesas</h3>
+<!-- Histórico de Despesas em Cards -->
+<div class="container-historico">
+    <h3 style="text-align: center; margin-bottom: 24px;">Histórico de Despesas</h3>
     
-    <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Lote</th>
-                        <th>Categoria</th>
-                        <th>Detalhes / Observação</th>
-                        <th>Valor (R$)</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for despesa in despesas %}
-                    <tr>
-                        <td><strong>{{ despesa.identificacao }}</strong></td>
-                        <td>{{ despesa.categoria }}</td>
-                        <td style="color: var(--texto-suave);">{{ despesa.observacao or '—' }}</td>
-                        <td style="font-weight: bold; color: var(--terracota-escuro);">R$ {{ "%.2f"|format(despesa.valor) }}</td>
-                        <td>
-                            <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Deseja realmente apagar esta despesa?');">
-                                <button type="submit" class="excluir" style="margin-top: 0; padding: 6px 14px; border-radius: 999px;">Excluir</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: var(--texto-suave);">Nenhuma despesa registrada ainda.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="lista-despesas">
+        {% for despesa in despesas %}
+        <div class="card-despesa">
+            <div class="despesa-info">
+                <span class="despesa-categoria">{{ despesa.categoria }}</span>
+                <strong class="despesa-lote">Lote: {{ despesa.identificacao }}</strong>
+                <p class="despesa-detalhes">{{ despesa.observacao or 'Sem observações adicionais.' }}</p>
+            </div>
+            
+            <div class="despesa-acao">
+                <strong class="despesa-valor">R$ {{ "%.2f"|format(despesa.valor) }}</strong>
+                
+                <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST" class="form-excluir" onsubmit="return confirm('Deseja realmente apagar esta despesa?');">
+                    <button type="submit" class="btn-tabela-excluir">Excluir</button>
+                </form>
+            </div>
         </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; background-color: var(--branco); border-radius: var(--raio); border: 1px dashed var(--borda);">
+            <p style="color: var(--texto-suave); margin: 0;">Nenhuma despesa registrada ainda.</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 
-<div style="text-align: center; margin-top: 40px;">
-    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
-</div>
-{% endblock %}
+{% endblock %}  
