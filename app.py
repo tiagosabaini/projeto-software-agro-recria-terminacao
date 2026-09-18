@@ -1,20 +1,66 @@
 from datetime import datetime
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, session, flash
 from config_banco import conectar, criar_tabelas
 
 app = Flask(__name__)
+# Chave de segurança obrigatória para o Flask proteger os cookies de login
+app.secret_key = 'chave_secreta_agro_2026' 
 criar_tabelas()
 
-@app.template_filter('data_br')
-def data_br(data_iso):
-    if not data_iso:
-        return "Não informada"
-    try:
-        obj_data = datetime.strptime(data_iso, '%Y-%m-%d')
-        return obj_data.strftime('%d/%m/%Y')
-    except:
-        return data_iso
+# --- INICIALIZAÇÃO DO USUÁRIO ÚNICO ---
+def configurar_usuarios():
+    conexao = conectar()
+    conexao.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT,
+            usuario TEXT UNIQUE,
+            senha TEXT
+        )
+    ''')
+    # Cria o usuário padrão se a tabela estiver vazia
+    usuario_existe = conexao.execute('SELECT * FROM usuarios').fetchone()
+    if not usuario_existe:
+        conexao.execute('INSERT INTO usuarios (nome, usuario, senha) VALUES (?, ?, ?)', ('Produtor Rural', 'admin', '1234'))
+        conexao.commit()
+    conexao.close()
 
+configurar_usuarios()
+
+# --- CONTROLE DE ACESSO GLOBAL ---
+@app.before_request
+def verificar_login():
+    rotas_livres = ['login', 'static']
+    # Se o usuário não estiver logado e tentar acessar o sistema, é barrado
+    if request.endpoint not in rotas_livres and 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
+# --- ROTAS DE AUTENTICAÇÃO ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        usuario = request.form.get('usuario')
+        senha = request.form.get('senha')
+        
+        conexao = conectar()
+        user = conexao.execute('SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', (usuario, senha)).fetchone()
+        conexao.close()
+        
+        if user:
+            session['usuario_id'] = user['id']
+            session['nome_usuario'] = user['nome']
+            return redirect(url_for('index'))
+        else:
+            flash('Usuário ou senha incorretos!', 'erro')
+            
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.clear() # Limpa os dados do usuário e sai do sistema
+    return redirect(url_for('login'))
+
+# --- SUAS ROTAS NORMAIS COMEÇAM AQUI ---
 @app.route('/')
 def index():
     return render_template('index.html')

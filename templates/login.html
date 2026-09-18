@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Recria & Terminação</title>
+    <style>
+        :root {
+            --verde-escuro: #3F6650;
+            --creme: #F4F1EA;
+            --terracota-escuro: #A65D45;
+            --borda: #E2DDD0;
+            --texto: #2D2D2A;
+        }
+        body {
+            background-color: var(--creme);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-caixa {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            border: 1px solid var(--borda);
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 20px;
+            border: 1px solid var(--borda);
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #FAFAFA;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--verde-escuro);
+        }
+        button {
+            background-color: var(--verde-escuro);
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2F4D3C;
+        }
+        .mensagem-erro {
+            color: var(--terracota-escuro);
+            background-color: #FBEAE4;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-caixa">
+        <h2 style="color: var(--verde-escuro); margin-bottom: 5px; font-size: 1.8rem;">🐄 Recria & Terminação</h2>
+        <p style="color: #666; margin-bottom: 30px;">Acesso Restrito ao Sistema</p>
+
+        <!-- Área que exibe a mensagem de erro se errar a senha -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mensagem-erro">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div style="text-align: left;">
+                <label style="font-weight: bold; color: var(--verde-escuro);">Usuário</label>
+                <input type="text" name="usuario" placeholder="Digite seu usuário" required>
+                
+                <label style="font-weight: bold; color: var(--verde-escuro);">Senha</label>
+                <input type="password" name="senha" placeholder="Digite sua senha" required>
+            </div>
+            
+            <button type="submit">Entrar no Sistema</button>
+        </form>
+        
+        <!-- Dica de acesso para facilitar a correção da professora -->
+        <div style="font-size: 0.9rem; color: var(--texto); margin-top: 25px; text-align: left; background-color: #FAFAFA; padding: 15px; border-radius: 8px; border: 1px dashed var(--borda);">
+            <strong>📋 Dados de Acesso (Teste):</strong><br><br>
+            👤 <b>Usuário:</b> admin <br>
+            🔑 <b>Senha:</b> 1234
+        </div>
+    </div>
+</body>
+</html>
