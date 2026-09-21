@@ -60,7 +60,18 @@ def logout():
     session.clear() # Limpa os dados do usuário e sai do sistema
     return redirect(url_for('login'))
 
-# --- SUAS ROTAS NORMAIS COMEÇAM AQUI ---
+# --- FILTROS DE DATA ---
+@app.template_filter('data_br')
+def data_br(data_iso):
+    if not data_iso:
+        return "Não informada"
+    try:
+        obj_data = datetime.strptime(data_iso, '%Y-%m-%d')
+        return obj_data.strftime('%d/%m/%Y')
+    except:
+        return data_iso
+
+# --- ROTAS DO SISTEMA ---
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -242,11 +253,10 @@ def pesagem():
         })
         anterior_por_lote[r['lote_id']] = r
 
-    # Opcional: Inverter a lista para mostrar a última pesagem primeiro
+    # Inverter a lista para mostrar a última pesagem primeiro (mais prático pro dia a dia)
     lista_pesagens.reverse()
 
     return render_template('pesagem.html', pesagens=lista_pesagens, lotes=lista_lotes)
-
 
 @app.route('/consumo_cocho', methods=['GET', 'POST'])
 def consumo_cocho():
@@ -255,6 +265,22 @@ def consumo_cocho():
     historico_consumo = []
     
     try:
+        # Garante que a tabela exista (segurança extra)
+        conexao.execute('''
+            CREATE TABLE IF NOT EXISTS consumo_sal (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lote_id INTEGER,
+                data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                qtd_sacos REAL,
+                peso_saco_kg REAL,
+                dias INTEGER,
+                qtd_bois INTEGER,
+                gramas_cab_dia REAL,
+                FOREIGN KEY(lote_id) REFERENCES lotes(id) ON DELETE CASCADE
+            )
+        ''')
+        conexao.commit()
+
         lista_lotes = conexao.execute('SELECT * FROM lotes').fetchall()
 
         if request.method == 'POST':
@@ -275,7 +301,7 @@ def consumo_cocho():
                         INSERT INTO consumo_sal (lote_id, qtd_sacos, peso_saco_kg, dias, qtd_bois, gramas_cab_dia)
                         VALUES (?, ?, ?, ?, ?, ?)
                     ''', (lote_id, qtd_sacos, peso_saco_kg, dias, qtd_bois, gramas_cab_dia))
-                
+            
             if lote_id:
                 lote_selecionado = conexao.execute('SELECT * FROM lotes WHERE id = ?', (int(lote_id),)).fetchone()
                 historico_consumo = conexao.execute('''
@@ -285,7 +311,6 @@ def consumo_cocho():
         conexao.close()
         
     return render_template('consumo.html', lotes=lista_lotes, lote_selecionado=lote_selecionado, historico_consumo=historico_consumo)
-
 
 @app.route('/registrar_venda', methods=['POST'])
 def registrar_venda():
@@ -297,7 +322,7 @@ def registrar_venda():
     conexao = conectar()
     try:
         with conexao:
-            # 1. Puxa os dados atuais do lote antes da venda
+            # Puxa os dados atuais do lote antes da venda
             lote = conexao.execute('SELECT qtd_cabecas, valor_venda_total, total_arrobas_vendidas FROM lotes WHERE id = ?', (lote_id,)).fetchone()
             
             if lote:
@@ -305,15 +330,15 @@ def registrar_venda():
                 valor_atual = lote['valor_venda_total'] or 0.0
                 arrobas_atual = lote['total_arrobas_vendidas'] or 0.0
                 
-                # 2. Calcula os novos valores (Deduz as cabeças e Acumula o dinheiro/arrobas)
+                # Calcula os novos valores (Deduz as cabeças e Acumula o dinheiro/arrobas)
                 nova_qtd = max(0, qtd_atual - qtd_vendida)
                 novo_valor_total = valor_atual + valor_venda
                 novo_total_arrobas = arrobas_atual + arrobas_vendidas
                 
-                # 3. Inteligência do Status: Se zerou os bois, finaliza. Senão, continua.
+                # Inteligência do Status: Se zerou os bois, finaliza. Senão, continua.
                 novo_status = 'Finalizado' if nova_qtd == 0 else 'Em Andamento'
                 
-                # 4. Atualiza o banco de dados
+                # Atualiza o banco de dados
                 conexao.execute('''
                     UPDATE lotes 
                     SET qtd_cabecas = ?, valor_venda_total = ?, total_arrobas_vendidas = ?, status = ?
