@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block titulo %}Configurar API de Cotações{% endblock %}
+
+{% block conteudo %}
+<div style="text-align: center; margin-bottom: 32px;">
+    <h2>⚙️ Painel da API Local de Cotações</h2>
+    <p style="color: var(--texto-suave);">Atualize a base de dados da API para o simulador de vendas puxar os valores reais da região de Rondônia.</p>
+</div>
+
+<div class="form-caixa" style="max-width: 600px; margin: 0 auto;">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="background-color: #E3F1E5; color: var(--verde-escuro); padding: 10px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; text-align: center;">
+                {{ messages[0][1] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('admin_cotacoes') }}" method="POST">
+        
+        <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">Valores Atuais da Arroba (@)</h3>
+        
+        {% for frigo in cotacoes %}
+        <div class="campo" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <label style="font-size: 1.1rem; width: 30%;">🏢 {{ frigo.frigorifico }}</label>
+            <div style="display: flex; align-items: center; width: 65%;">
+                <span style="font-weight: bold; color: var(--texto-suave); margin-right: 10px;">R$</span>
+                <input type="number" step="0.01" name="{{ frigo.frigorifico }}" value="{{ frigo.preco }}" style="margin: 0;" required>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <button type="submit" style="margin-top: 20px;">Atualizar API no Servidor</button>
+    </form>
+    
+    <div style="margin-top: 30px; font-size: 0.85rem; color: #888; background-color: #FAFAFA; padding: 15px; border-radius: 8px;">
+        <strong>🔗 Endpoint Gerado:</strong> O seu sistema agora possui um endpoint JSON rodando em <code>/api/cotacoes</code> que o frontend consome automaticamente no Painel de Lucros.
+    </div>
+</div>
+
+<div style="text-align: center; margin-top: 24px;">
+    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+</div>
+{% endblock %}

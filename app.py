@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import Flask, redirect, render_template, request, url_for, session, flash
+from flask import Flask, redirect, render_template, request, url_for, session, flash, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from config_banco import conectar, criar_tabelas
 
 app = Flask(__name__)
@@ -7,31 +8,109 @@ app = Flask(__name__)
 app.secret_key = 'chave_secreta_agro_2026' 
 criar_tabelas()
 
-# --- INICIALIZAÇÃO DO USUÁRIO ÚNICO ---
-def configurar_usuarios():
+def configurar_sistema():
     conexao = conectar()
+    
+    # 1. Tabela de Usuários com Nível de Acesso
     conexao.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT,
             usuario TEXT UNIQUE,
-            senha TEXT
+            senha TEXT,
+            nivel_acesso TEXT
         )
     ''')
-    # Cria o usuário padrão se a tabela estiver vazia
     usuario_existe = conexao.execute('SELECT * FROM usuarios').fetchone()
     if not usuario_existe:
-        conexao.execute('INSERT INTO usuarios (nome, usuario, senha) VALUES (?, ?, ?)', ('Produtor Rural', 'admin', '1234'))
-        conexao.commit()
+        # Criptografando as senhas antes de salvar no banco
+        senha_produtor = generate_password_hash('1234')
+        senha_tiago = generate_password_hash('admin2026')
+        
+        # Cria o usuário normal (que vai ser avaliado pela professora)
+        conexao.execute('INSERT INTO usuarios (nome, usuario, senha, nivel_acesso) VALUES (?, ?, ?, ?)', 
+                        ('Produtor Rural', 'admin', senha_produtor, 'comum'))
+        
+        # Cria o SEU usuário de SysAdmin (Dono do Sistema)
+        conexao.execute('INSERT INTO usuarios (nome, usuario, senha, nivel_acesso) VALUES (?, ?, ?, ?)', 
+                        ('Tiago Sabaini (SysAdmin)', 'tiago', senha_tiago, 'sysadmin'))
+    
+    # 2. Tabela da API de Cotações
+    conexao.execute('''
+        CREATE TABLE IF NOT EXISTS cotacoes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            frigorifico TEXT UNIQUE,
+            preco REAL
+        )
+    ''')
+    if not conexao.execute('SELECT * FROM cotacoes').fetchone():
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('JBS', 275.0))
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('Frigon', 278.0))
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('Minerva', 274.0))
+        
+    try:
+        conexao.execute('ALTER TABLE lotes ADD COLUMN frigorifico_comprador TEXT')
+    except:
+        pass 
+
+    conexao.commit()
     conexao.close()
 
-configurar_usuarios()
+configurar_sistema()def configurar_sistema():
+    conexao = conectar()
+    
+    # 1. Tabela de Usuários com Nível de Acesso
+    conexao.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT,
+            usuario TEXT UNIQUE,
+            senha TEXT,
+            nivel_acesso TEXT
+        )
+    ''')
+    usuario_existe = conexao.execute('SELECT * FROM usuarios').fetchone()
+    if not usuario_existe:
+        # Criptografando as senhas antes de salvar no banco
+        senha_produtor = generate_password_hash('1234')
+        senha_tiago = generate_password_hash('admin2026')
+        
+        # Cria o usuário normal (que vai ser avaliado pela professora)
+        conexao.execute('INSERT INTO usuarios (nome, usuario, senha, nivel_acesso) VALUES (?, ?, ?, ?)', 
+                        ('Produtor Rural', 'admin', senha_produtor, 'comum'))
+        
+        # Cria o SEU usuário de SysAdmin (Dono do Sistema)
+        conexao.execute('INSERT INTO usuarios (nome, usuario, senha, nivel_acesso) VALUES (?, ?, ?, ?)', 
+                        ('Tiago Sabaini (SysAdmin)', 'tiago', senha_tiago, 'sysadmin'))
+    
+    # 2. Tabela da API de Cotações
+    conexao.execute('''
+        CREATE TABLE IF NOT EXISTS cotacoes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            frigorifico TEXT UNIQUE,
+            preco REAL
+        )
+    ''')
+    if not conexao.execute('SELECT * FROM cotacoes').fetchone():
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('JBS', 275.0))
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('Frigon', 278.0))
+        conexao.execute('INSERT INTO cotacoes (frigorifico, preco) VALUES (?, ?)', ('Minerva', 274.0))
+        
+    try:
+        conexao.execute('ALTER TABLE lotes ADD COLUMN frigorifico_comprador TEXT')
+    except:
+        pass 
+
+    conexao.commit()
+    conexao.close()
+
+configurar_sistema()
 
 # --- CONTROLE DE ACESSO GLOBAL ---
 @app.before_request
 def verificar_login():
-    rotas_livres = ['login', 'static']
-    # Se o usuário não estiver logado e tentar acessar o sistema, é barrado
+    # Permite acesso à tela de login, arquivos CSS/JS e consumo da API de Cotações
+    rotas_livres = ['login', 'static', 'api_cotacoes']
     if request.endpoint not in rotas_livres and 'usuario_id' not in session:
         return redirect(url_for('login'))
 
@@ -60,6 +139,40 @@ def logout():
     session.clear() # Limpa os dados do usuário e sai do sistema
     return redirect(url_for('login'))
 
+# --- ROTAS DA API INTERNA E CONFIGURAÇÃO DE PREÇOS ---
+@app.route('/api/cotacoes')
+def api_cotacoes():
+    conexao = conectar()
+    try:
+        cotacoes = conexao.execute('SELECT * FROM cotacoes').fetchall()
+        # Converte para JSON ex: {"JBS": 275.0, "Frigon": 278.0}
+        dados = {c['frigorifico']: c['preco'] for c in cotacoes}
+        return jsonify(dados)
+    finally:
+        conexao.close()
+
+@app.route('/admin_cotacoes', methods=['GET', 'POST'])
+def admin_cotacoes():
+    conexao = conectar()
+    try:
+        if request.method == 'POST':
+            preco_jbs = float(request.form.get('JBS', 0))
+            preco_frigon = float(request.form.get('Frigon', 0))
+            preco_minerva = float(request.form.get('Minerva', 0))
+            
+            with conexao:
+                conexao.execute('UPDATE cotacoes SET preco = ? WHERE frigorifico = ?', (preco_jbs, 'JBS'))
+                conexao.execute('UPDATE cotacoes SET preco = ? WHERE frigorifico = ?', (preco_frigon, 'Frigon'))
+                conexao.execute('UPDATE cotacoes SET preco = ? WHERE frigorifico = ?', (preco_minerva, 'Minerva'))
+            
+            flash('Cotações da região atualizadas na API com sucesso!', 'sucesso')
+            return redirect(url_for('admin_cotacoes'))
+            
+        cotacoes = conexao.execute('SELECT * FROM cotacoes').fetchall()
+    finally:
+        conexao.close()
+    return render_template('cotacoes.html', cotacoes=cotacoes)
+
 # --- FILTROS DE DATA ---
 @app.template_filter('data_br')
 def data_br(data_iso):
@@ -71,7 +184,7 @@ def data_br(data_iso):
     except:
         return data_iso
 
-# --- ROTAS DO SISTEMA ---
+# --- ROTAS DO SISTEMA (CONTEÚDO PRINCIPAL) ---
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -115,7 +228,6 @@ def excluir_lote(id):
     conexao = conectar()
     try:
         with conexao:
-            # O 'ON DELETE CASCADE' configurado no banco apagará despesas, pesagens e consumos automaticamente.
             conexao.execute('DELETE FROM lotes WHERE id = ?', (id,))
     finally:
         conexao.close()
@@ -253,7 +365,6 @@ def pesagem():
         })
         anterior_por_lote[r['lote_id']] = r
 
-    # Inverter a lista para mostrar a última pesagem primeiro (mais prático pro dia a dia)
     lista_pesagens.reverse()
 
     return render_template('pesagem.html', pesagens=lista_pesagens, lotes=lista_lotes)
@@ -265,7 +376,6 @@ def consumo_cocho():
     historico_consumo = []
     
     try:
-        # Garante que a tabela exista (segurança extra)
         conexao.execute('''
             CREATE TABLE IF NOT EXISTS consumo_sal (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -315,6 +425,7 @@ def consumo_cocho():
 @app.route('/registrar_venda', methods=['POST'])
 def registrar_venda():
     lote_id = request.form.get('lote_id')
+    frigorifico = request.form.get('frigorifico_comprador') # Pegando quem comprou
     qtd_vendida = int(request.form.get('qtd_vendida', 0))
     valor_venda = float(request.form.get('valor_venda_total', 0))
     arrobas_vendidas = float(request.form.get('total_arrobas_vendidas', 0))
@@ -338,12 +449,12 @@ def registrar_venda():
                 # Inteligência do Status: Se zerou os bois, finaliza. Senão, continua.
                 novo_status = 'Finalizado' if nova_qtd == 0 else 'Em Andamento'
                 
-                # Atualiza o banco de dados
+                # Atualiza o banco de dados salvando também o frigorífico comprador
                 conexao.execute('''
                     UPDATE lotes 
-                    SET qtd_cabecas = ?, valor_venda_total = ?, total_arrobas_vendidas = ?, status = ?
+                    SET qtd_cabecas = ?, valor_venda_total = ?, total_arrobas_vendidas = ?, status = ?, frigorifico_comprador = ?
                     WHERE id = ?
-                ''', (nova_qtd, novo_valor_total, novo_total_arrobas, novo_status, lote_id))
+                ''', (nova_qtd, novo_valor_total, novo_total_arrobas, novo_status, frigorifico, lote_id))
     finally:
         conexao.close()
         
