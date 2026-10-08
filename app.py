@@ -56,7 +56,8 @@ def configurar_sistema():
     conexao.commit()
     conexao.close()
 
-configurar_sistema()def configurar_sistema():
+configurar_sistema() 
+def configurar_sistema():
     conexao = conectar()
     
     # 1. Tabela de Usuários com Nível de Acesso
