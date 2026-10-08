@@ -155,6 +155,10 @@ def api_cotacoes():
 
 @app.route('/admin_cotacoes', methods=['GET', 'POST'])
 def admin_cotacoes():
+    # BARREIRA DE SEGURANÇA (RBAC): Somente o SysAdmin passa daqui
+    if session.get('nivel_acesso') != 'sysadmin':
+        return "Erro 403: Acesso Proibido. Você não possui privilégios de SysAdmin para editar a API do sistema.", 403
+
     conexao = conectar()
     try:
         if request.method == 'POST':
