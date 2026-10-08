@@ -122,12 +122,14 @@ def login():
         senha = request.form.get('senha')
         
         conexao = conectar()
-        user = conexao.execute('SELECT * FROM usuarios WHERE usuario = ? AND senha = ?', (usuario, senha)).fetchone()
+        user = conexao.execute('SELECT * FROM usuarios WHERE usuario = ?', (usuario,)).fetchone()
         conexao.close()
         
-        if user:
+        # Verifica se o usuário existe E se a senha descriptografada bate com a digitada
+        if user and check_password_hash(user['senha'], senha):
             session['usuario_id'] = user['id']
             session['nome_usuario'] = user['nome']
+            session['nivel_acesso'] = user['nivel_acesso'] # Guarda o nível na sessão
             return redirect(url_for('index'))
         else:
             flash('Usuário ou senha incorretos!', 'erro')
