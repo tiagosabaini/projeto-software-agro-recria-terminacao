@@ -1,3 +1,13 @@
+/* --- DEFINIÇÃO DA FONTE CUSTOMIZADA --- */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Baloo+2:wght@700;800&display=swap');
+
+/* Se a fonte Story Script for local ou importada, ela será aplicada abaixo */
+.story-script-regular {
+    font-family: "Story Script", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
 /* --- RESET E BASE --- */
 * {
     box-sizing: border-box;
@@ -6,25 +16,22 @@
 }
 
 :root {
-    /* Paleta Estilo Hospitalar / Saúde & Clínica Tech */
-    --fundo-principal: #EBF3F5; /* Fundo estilo hospital / azulejo sanitário claro */
+    /* Paleta Estilo Hospitalar / Saúde & Clínica Tech (Mantida intacta) */
+    --fundo-principal: #EBF3F5;
     --fundo-card: #FFFFFF;
     --fundo-subtil: #E0F2FE;
     
-    /* Cores de Destaque Clínico */
     --azul-hospitalar: #0284C7;
     --azul-escuro: #0369A1;
     --azul-suave: #E0F2FE;
     --verde-medico: #0D9488;
     
-    /* Tipografia e Neutros Sanitários */
     --texto-titulo: #0F172A;
     --texto-corpo: #334155;
     --texto-suave: #64748B;
     --borda: #CBD5E1;
     --borda-hover: #38BDF8;
     
-    /* Métrica, Layout e Elevação */
     --raio: 20px;
     --raio-peq: 10px;
     --sombra-suave: 0 10px 30px -4px rgba(2, 132, 199, 0.08);
@@ -33,7 +40,7 @@
 }
 
 body {
-    font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Story Script", 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--fundo-principal);
     color: var(--texto-corpo);
     line-height: 1.6;
@@ -43,9 +50,9 @@ body {
 }
 
 h1, h2, h3, h4 {
-    font-family: 'Baloo 2', 'Nunito Sans', sans-serif;
+    font-family: "Story Script", 'Baloo 2', 'Nunito Sans', sans-serif;
     color: var(--texto-titulo);
-    font-weight: 700;
+    font-weight: 400;
     text-align: center;
     margin-bottom: 16px;
     letter-spacing: -0.02em;
@@ -70,9 +77,9 @@ h1, h2, h3, h4 {
 }
 
 .navbar-marca {
-    font-family: 'Baloo 2', sans-serif;
-    font-weight: 800;
-    font-size: 1.4rem;
+    font-family: "Story Script", 'Baloo 2', sans-serif;
+    font-weight: 400;
+    font-size: 1.5rem;
     letter-spacing: -0.03em;
     color: var(--azul-escuro);
 }
@@ -84,10 +91,11 @@ h1, h2, h3, h4 {
 }
 
 .navbar-links a {
+    font-family: "Story Script", sans-serif;
     color: var(--texto-suave);
     text-decoration: none;
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: 1.05rem;
+    font-weight: 400;
     padding: 8px 16px;
     border-radius: var(--raio-peq);
     transition: var(--transicao);
@@ -131,16 +139,17 @@ button.menu-mobile-btn {
 }
 
 .container-inicio h1 {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     color: var(--texto-titulo);
     margin-bottom: 8px;
 }
 
 .subtitulo {
+    font-family: "Story Script", sans-serif;
     color: var(--texto-suave);
     margin-bottom: 48px;
-    font-size: 1.05rem;
-    font-weight: 500;
+    font-size: 1.15rem;
+    font-weight: 400;
 }
 
 .grid-menu {
@@ -151,9 +160,7 @@ button.menu-mobile-btn {
     width: 100%;
 }
 
-/* ================================================================= *
- * CARDS DO MENU (ALTAMENTE MODERNOS, LINDOS E CLÍNICOS)
- * ================================================================= */
+/* --- CARDS DO MENU (MODERNOS E CLÍNICOS) --- */
 .card-menu {
     background: linear-gradient(145deg, #FFFFFF 0%, #F4F8FA 100%);
     border: 1.5px solid rgba(203, 213, 225, 0.7);
@@ -174,7 +181,6 @@ button.menu-mobile-btn {
     overflow: hidden;
 }
 
-/* Barra de destaque superior com a cor hospitalar */
 .card-menu::before {
     content: '';
     position: absolute;
@@ -214,12 +220,13 @@ button.menu-mobile-btn {
 
 .card-menu h3 {
     margin: 0 0 10px 0;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     color: var(--texto-titulo);
 }
 
 .card-menu p {
-    font-size: 0.92rem;
+    font-family: "Story Script", sans-serif;
+    font-size: 1rem;
     color: var(--texto-suave);
     margin: 0;
     line-height: 1.5;
@@ -239,7 +246,7 @@ button.menu-mobile-btn {
 
 .form-caixa h3 {
     margin-bottom: 24px;
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     text-align: left;
     color: var(--texto-titulo);
 }
@@ -250,21 +257,22 @@ button.menu-mobile-btn {
 }
 
 .campo label {
+    font-family: "Story Script", sans-serif;
     display: block;
     margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 0.88rem;
+    font-weight: 400;
+    font-size: 1rem;
     color: var(--texto-titulo);
 }
 
 .campo input,
 .campo select {
+    font-family: "Story Script", sans-serif;
     width: 100%;
     padding: 12px 16px;
     border: 1px solid var(--borda);
     border-radius: var(--raio-peq);
-    font-size: 0.95rem;
-    font-family: inherit;
+    font-size: 1.05rem;
     background-color: #FFFFFF;
     transition: var(--transicao);
     color: var(--texto-corpo);
@@ -287,14 +295,14 @@ button.menu-mobile-btn {
 /* --- BOTÕES CLÍNICOS --- */
 button,
 .botao {
+    font-family: "Story Script", sans-serif;
     background-color: var(--azul-hospitalar);
     color: #FFFFFF;
     border: none;
     padding: 12px 24px;
     border-radius: var(--raio-peq);
-    font-size: 0.95rem;
-    font-weight: 700;
-    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 400;
     cursor: pointer;
     display: inline-flex;
     justify-content: center;
@@ -323,13 +331,15 @@ button:active,
 }
 
 .voltar {
+    font-family: "Story Script", sans-serif;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     margin-top: 24px;
     color: var(--texto-suave);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 400;
+    font-size: 1.05rem;
     transition: var(--transicao);
 }
 
@@ -352,16 +362,18 @@ table {
 }
 
 th, td {
+    font-family: "Story Script", sans-serif;
     padding: 16px 20px;
     text-align: left;
     border-bottom: 1px solid var(--borda);
     vertical-align: middle;
+    font-size: 1.05rem;
 }
 
 th {
     background-color: var(--fundo-subtil);
     color: var(--texto-titulo);
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: 0.02em;
 }
 
@@ -383,12 +395,13 @@ tr:hover td {
 a.btn-tabela,
 a.btn-tabela-secundario,
 button.btn-tabela-excluir {
+    font-family: "Story Script", sans-serif;
     width: auto !important;
     margin: 0 !important;
-    height: 32px;
+    height: 34px;
     padding: 0 14px;
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.95rem;
+    font-weight: 400;
     border-radius: 6px;
     display: inline-flex;
     align-items: center;
@@ -462,10 +475,11 @@ button.btn-tabela-excluir:hover {
 }
 
 .despesa-categoria {
-    font-size: 0.75rem;
+    font-family: "Story Script", sans-serif;
+    font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-weight: 700;
+    font-weight: 400;
     color: var(--azul-escuro);
     background-color: var(--azul-suave);
     padding: 3px 8px;
@@ -474,21 +488,24 @@ button.btn-tabela-excluir:hover {
 }
 
 .despesa-lote {
-    font-size: 1rem;
+    font-family: "Story Script", sans-serif;
+    font-size: 1.1rem;
     color: var(--texto-titulo);
-    font-weight: 700;
+    font-weight: 400;
 }
 
 .despesa-detalhes {
-    font-size: 0.9rem;
+    font-family: "Story Script", sans-serif;
+    font-size: 1rem;
     color: var(--texto-suave);
     margin: 0;
 }
 
 .despesa-valor {
-    font-size: 1.25rem;
+    font-family: "Story Script", sans-serif;
+    font-size: 1.35rem;
     color: #DC2626;
-    font-weight: 700;
+    font-weight: 400;
 }
 
 /* --- RESPONSIVIDADE (MOBILE) --- */
