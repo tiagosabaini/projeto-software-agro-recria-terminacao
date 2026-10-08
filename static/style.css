@@ -6,25 +6,26 @@
 }
 
 :root {
-    --verde-salvia: #8FB99B;
-    --verde-escuro: #1b5e3a;
-    --creme: #F4F2EC;
+    --fundo-creme: #F5DD9D;
+    --verde-claro: #BCC499;
+    --verde-medio: #92A68A;
+    --verde-azulado: #7B8F8A;
+    --cinza-escuro: #506266;
+    
     --branco: #FFFFFF;
-    --terracota: #E8B4A0;
-    --terracota-escuro: #A65D45;
-    --texto: #2D2D2A;
-    --texto-suave: #66665D;
-    --borda: #E2DDD0;
+    --texto: #2D3738;
+    --texto-suave: #506266;
+    --borda: #D4D8BD;
     --raio: 20px;
     --raio-peq: 12px;
-    --sombra-suave: 0 8px 24px rgba(44, 74, 58, 0.05);
-    --sombra-hover: 0 16px 32px rgba(44, 74, 58, 0.12);
+    --sombra-suave: 0 8px 24px rgba(80, 98, 102, 0.08);
+    --sombra-hover: 0 16px 32px rgba(80, 98, 102, 0.15);
     --transicao: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 body {
     font-family: 'Nunito Sans', Arial, sans-serif;
-    background-color: var(--creme);
+    background-color: var(--fundo-creme);
     color: var(--texto);
     line-height: 1.6;
     display: flex;
@@ -37,7 +38,7 @@ h2,
 h3,
 h4 {
     font-family: 'Baloo 2', 'Nunito Sans', sans-serif;
-    color: var(--verde-escuro);
+    color: var(--cinza-escuro);
     font-weight: 700;
     text-align: center;
     margin-bottom: 24px;
@@ -45,20 +46,20 @@ h4 {
 
 /* --- NAVBAR --- */
 .navbar {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: var(--verde-escuro);
+    color: var(--cinza-escuro);
     padding: 16px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    border-bottom: 1px solid rgba(226, 221, 208, 0.5);
+    border-bottom: 1px solid var(--borda);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 12px rgba(80, 98, 102, 0.05);
 }
 
 .navbar-marca {
@@ -66,6 +67,7 @@ h4 {
     font-weight: 700;
     font-size: 1.4rem;
     letter-spacing: -0.5px;
+    color: var(--cinza-escuro);
 }
 
 .navbar-links {
@@ -85,8 +87,8 @@ h4 {
 }
 
 .navbar-links a:hover {
-    color: var(--verde-escuro);
-    background-color: rgba(143, 185, 155, 0.15);
+    color: var(--cinza-escuro);
+    background-color: rgba(188, 196, 153, 0.3);
 }
 
 /* --- MENU MOBILE --- */
@@ -94,7 +96,7 @@ button.menu-mobile-btn {
     display: none;
     width: auto;
     background-color: transparent;
-    color: var(--verde-escuro);
+    color: var(--cinza-escuro);
     border: none;
     padding: 4px 8px;
     margin: 0;
@@ -108,7 +110,7 @@ button.menu-mobile-btn:hover {
     background-color: transparent;
     box-shadow: none;
     transform: none;
-    color: var(--verde-salvia);
+    color: var(--verde-azulado);
 }
 
 /* --- CONTEUDO --- */
@@ -163,7 +165,7 @@ button.menu-mobile-btn:hover {
 .card-menu:hover {
     transform: translateY(-6px);
     box-shadow: var(--sombra-hover);
-    border-color: var(--verde-salvia);
+    border-color: var(--verde-medio);
 }
 
 .card-menu .icone {
@@ -179,6 +181,7 @@ button.menu-mobile-btn:hover {
 .card-menu h3 {
     margin: 0 0 10px 0;
     font-size: 1.25rem;
+    color: var(--cinza-escuro);
 }
 
 .card-menu p {
@@ -203,6 +206,7 @@ button.menu-mobile-btn:hover {
     margin-bottom: 24px;
     font-size: 1.2rem;
     text-align: left;
+    color: var(--cinza-escuro);
 }
 
 .campo {
@@ -215,7 +219,7 @@ button.menu-mobile-btn:hover {
     margin-bottom: 8px;
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--verde-escuro);
+    color: var(--cinza-escuro);
 }
 
 .campo input,
@@ -226,7 +230,7 @@ button.menu-mobile-btn:hover {
     border-radius: var(--raio-peq);
     font-size: 1rem;
     font-family: 'Nunito Sans', sans-serif;
-    background-color: #FAFAFA;
+    background-color: #FAF9F5;
     transition: var(--transicao);
     color: var(--texto);
 }
@@ -234,9 +238,9 @@ button.menu-mobile-btn:hover {
 .campo input:focus,
 .campo select:focus {
     outline: none;
-    border-color: var(--verde-salvia);
+    border-color: var(--verde-medio);
     background-color: var(--branco);
-    box-shadow: 0 0 0 4px rgba(143, 185, 155, 0.2);
+    box-shadow: 0 0 0 4px rgba(146, 166, 138, 0.25);
 }
 
 .form-linha {
@@ -251,13 +255,12 @@ button.menu-mobile-btn:hover {
 }
 
 /* ================================================================= *
- * BOTOES 3D MODERNOS E PODEROSOS (ATUALIZADO)
+ * BOTOES 3D MODERNOS E PODEROSOS
  * ================================================================= */
 button,
 .botao {
-    /* Gradiente sutil para dar volume */
-    background: linear-gradient(135deg, var(--verde-salvia) 0%, #6fa07c 100%);
-    color: var(--verde-escuro);
+    background: linear-gradient(135deg, var(--verde-medio) 0%, var(--verde-azulado) 100%);
+    color: var(--branco);
     border: none;
     padding: 14px 28px;
     border-radius: 999px;
@@ -272,8 +275,7 @@ button,
     width: 100%;
     margin-top: 10px;
     
-    /* Efeito 3D: Sombra projetada + Borda inferior simulando relevo */
-    box-shadow: 0 6px 0 #4f825e, 0 10px 20px rgba(27, 94, 58, 0.25);
+    box-shadow: 0 6px 0 #506266, 0 10px 20px rgba(80, 98, 102, 0.25);
     transition: all 0.15s ease-in-out;
 }
 
@@ -285,32 +287,30 @@ button,
     width: auto;
 }
 
-/* Efeito ao passar o mouse (flutua levemente) */
 button:hover,
 .botao:hover {
     transform: translateY(-3px);
-    box-shadow: 0 9px 0 #4f825e, 0 14px 25px rgba(27, 94, 58, 0.35);
-    filter: brightness(1.05);
+    box-shadow: 0 9px 0 #506266, 0 14px 25px rgba(80, 98, 102, 0.35);
+    filter: brightness(1.08);
 }
 
-/* Efeito 3D de clique real: o botão "afunda" */
 button:active,
 .botao:active {
     transform: translateY(3px);
-    box-shadow: 0 2px 0 #4f825e, 0 4px 10px rgba(27, 94, 58, 0.2);
+    box-shadow: 0 2px 0 #506266, 0 4px 10px rgba(80, 98, 102, 0.2);
 }
 
 .voltar {
     display: inline-block;
     margin-top: 24px;
-    color: var(--verde-escuro);
+    color: var(--cinza-escuro);
     text-decoration: none;
     font-weight: 700;
     transition: var(--transicao);
 }
 
 .voltar:hover {
-    color: var(--verde-salvia);
+    color: var(--verde-azulado);
     transform: translateX(-4px);
 }
 
@@ -336,8 +336,8 @@ td {
 }
 
 th {
-    background-color: var(--verde-escuro);
-    color: var(--branco);
+    background-color: var(--cinza-escuro);
+    color: var(--fundo-creme);
     font-weight: 700;
     font-family: 'Baloo 2', sans-serif;
     letter-spacing: 0.5px;
@@ -348,7 +348,7 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background-color: #F8F9F5;
+    background-color: #F8F7F0;
 }
 
 .grupo-botoes-tabela {
@@ -364,7 +364,7 @@ tr:hover td {
     display: inline-flex;
 }
 
-/* --- BOTÕES MINI DA TABELA (Também em 3D moderno) --- */
+/* --- BOTÕES MINI DA TABELA --- */
 a.btn-tabela,
 a.btn-tabela-secundario,
 button.btn-tabela-excluir {
@@ -384,45 +384,44 @@ button.btn-tabela-excluir {
 }
 
 a.btn-tabela {
-    background: linear-gradient(135deg, var(--verde-salvia) 0%, #6fa07c 100%);
-    color: var(--verde-escuro);
-    box-shadow: 0 3px 0 #4f825e, 0 5px 10px rgba(27, 94, 58, 0.15);
+    background: linear-gradient(135deg, var(--verde-medio) 0%, var(--verde-azulado) 100%);
+    color: var(--branco);
+    box-shadow: 0 3px 0 #506266, 0 5px 10px rgba(80, 98, 102, 0.15);
 }
 
 a.btn-tabela-secundario {
-    background: linear-gradient(135deg, #E2DDD0 0%, #cac3b4 100%);
-    color: var(--texto);
-    box-shadow: 0 3px 0 #b3aba0, 0 5px 10px rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, var(--verde-claro) 0%, #a8b082 100%);
+    color: var(--cinza-escuro);
+    box-shadow: 0 3px 0 #899368, 0 5px 10px rgba(80, 98, 102, 0.12);
 }
 
 button.btn-tabela-excluir {
-    background: linear-gradient(135deg, #FFF0ED 0%, #ffd6d0 100%);
-    color: var(--terracota-escuro);
+    background: linear-gradient(135deg, #FBEAE4 0%, #f5cfc4 100%);
+    color: #A65D45;
     border: 1px solid rgba(166, 93, 69, 0.3);
     box-shadow: 0 3px 0 #d99688, 0 5px 10px rgba(166, 93, 69, 0.15);
 }
 
-/* Hover e Active dos botões de tabela */
 a.btn-tabela:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 0 #4f825e, 0 7px 12px rgba(27, 94, 58, 0.25);
+    box-shadow: 0 5px 0 #506266, 0 7px 12px rgba(80, 98, 102, 0.25);
 }
 a.btn-tabela:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 0 #4f825e;
+    box-shadow: 0 1px 0 #506266;
 }
 
 a.btn-tabela-secundario:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 0 #b3aba0, 0 7px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 5px 0 #899368, 0 7px 12px rgba(80, 98, 102, 0.2);
 }
 a.btn-tabela-secundario:active {
     transform: translateY(2px);
-    box-shadow: 0 1px 0 #b3aba0;
+    box-shadow: 0 1px 0 #899368;
 }
 
 button.btn-tabela-excluir:hover {
-    background: linear-gradient(135deg, var(--terracota) 0%, #c46d52 100%);
+    background: linear-gradient(135deg, #E8B4A0 0%, #c46d52 100%);
     color: #FFF;
     transform: translateY(-2px);
     box-shadow: 0 5px 0 #8c4c37, 0 7px 12px rgba(166, 93, 69, 0.3);
@@ -448,7 +447,7 @@ button.btn-tabela-excluir:active {
 .card-despesa {
     background-color: var(--branco);
     border: 1px solid var(--borda);
-    border-left: 6px solid var(--verde-salvia);
+    border-left: 6px solid var(--verde-medio);
     border-radius: var(--raio-peq);
     padding: 20px 24px;
     display: flex;
@@ -461,7 +460,7 @@ button.btn-tabela-excluir:active {
 .card-despesa:hover {
     transform: translateX(4px);
     box-shadow: var(--sombra-hover);
-    border-color: var(--verde-salvia);
+    border-color: var(--verde-medio);
 }
 
 .despesa-info {
@@ -475,8 +474,8 @@ button.btn-tabela-excluir:active {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
-    color: var(--verde-escuro);
-    background-color: #E3F1E5;
+    color: var(--cinza-escuro);
+    background-color: rgba(188, 196, 153, 0.35);
     padding: 4px 10px;
     border-radius: 6px;
     align-self: flex-start;
@@ -505,7 +504,7 @@ button.btn-tabela-excluir:active {
 
 .despesa-valor {
     font-size: 1.4rem;
-    color: var(--terracota-escuro);
+    color: #A65D45;
     font-weight: 700;
 }
 
@@ -531,8 +530,8 @@ button.btn-tabela-excluir:active {
 .card h4 {
     margin-top: 0;
     text-align: left;
-    color: var(--verde-escuro);
-    border-bottom: 2px solid var(--creme);
+    color: var(--cinza-escuro);
+    border-bottom: 2px solid var(--fundo-creme);
     padding-bottom: 12px;
     margin-bottom: 16px;
 }
@@ -556,14 +555,14 @@ button.btn-tabela-excluir:active {
 }
 
 .alerta-verde {
-    background-color: #E3F1E5;
-    color: var(--verde-escuro);
-    border: 1px solid #A8D0B3;
+    background-color: rgba(146, 166, 138, 0.2);
+    color: var(--cinza-escuro);
+    border: 1px solid var(--verde-medio);
 }
 
 .alerta-vermelho {
     background-color: #FBEAE4;
-    color: var(--terracota-escuro);
+    color: #A65D45;
     border: 1px solid #E8B4A0;
 }
 
