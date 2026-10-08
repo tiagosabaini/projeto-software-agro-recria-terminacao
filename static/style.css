@@ -19,7 +19,7 @@
     --raio-peq: 12px;
     --sombra-suave: 0 8px 24px rgba(44, 74, 58, 0.05);
     --sombra-hover: 0 16px 32px rgba(44, 74, 58, 0.12);
-    --transicao: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --transicao: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 body {
@@ -250,25 +250,31 @@ button.menu-mobile-btn:hover {
     margin-bottom: 0;
 }
 
-/* --- BOTOES --- */
+/* ================================================================= *
+ * BOTOES 3D MODERNOS E PODEROSOS (ATUALIZADO)
+ * ================================================================= */
 button,
 .botao {
-    background-color: var(--verde-salvia);
+    /* Gradiente sutil para dar volume */
+    background: linear-gradient(135deg, var(--verde-salvia) 0%, #6fa07c 100%);
     color: var(--verde-escuro);
     border: none;
-    padding: 12px 28px;
+    padding: 14px 28px;
     border-radius: 999px;
     font-size: 1rem;
-    font-weight: 700;
+    font-weight: 800;
     font-family: 'Nunito Sans', sans-serif;
     cursor: pointer;
-    transition: var(--transicao);
     display: inline-flex;
     justify-content: center;
     align-items: center;
     text-decoration: none;
     width: 100%;
     margin-top: 10px;
+    
+    /* Efeito 3D: Sombra projetada + Borda inferior simulando relevo */
+    box-shadow: 0 6px 0 #4f825e, 0 10px 20px rgba(27, 94, 58, 0.25);
+    transition: all 0.15s ease-in-out;
 }
 
 .botao {
@@ -279,11 +285,19 @@ button,
     width: auto;
 }
 
+/* Efeito ao passar o mouse (flutua levemente) */
 button:hover,
 .botao:hover {
-    background-color: #7BAA8A;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(123, 170, 138, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 9px 0 #4f825e, 0 14px 25px rgba(27, 94, 58, 0.35);
+    filter: brightness(1.05);
+}
+
+/* Efeito 3D de clique real: o botão "afunda" */
+button:active,
+.botao:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #4f825e, 0 4px 10px rgba(27, 94, 58, 0.2);
 }
 
 .voltar {
@@ -350,54 +364,72 @@ tr:hover td {
     display: inline-flex;
 }
 
+/* --- BOTÕES MINI DA TABELA (Também em 3D moderno) --- */
 a.btn-tabela,
 a.btn-tabela-secundario,
 button.btn-tabela-excluir {
     width: auto !important;
     margin: 0 !important;
-    height: 32px;
-    padding: 0 14px;
-    font-size: 0.85rem;
-    font-weight: 700;
+    height: 34px;
+    padding: 0 16px;
+    font-size: 0.82rem;
+    font-weight: 800;
     border-radius: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    box-shadow: none;
-    transform: none;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
 }
 
 a.btn-tabela {
-    background-color: var(--verde-salvia);
+    background: linear-gradient(135deg, var(--verde-salvia) 0%, #6fa07c 100%);
     color: var(--verde-escuro);
+    box-shadow: 0 3px 0 #4f825e, 0 5px 10px rgba(27, 94, 58, 0.15);
 }
 
 a.btn-tabela-secundario {
-    background-color: #E2DDD0;
+    background: linear-gradient(135deg, #E2DDD0 0%, #cac3b4 100%);
     color: var(--texto);
+    box-shadow: 0 3px 0 #b3aba0, 0 5px 10px rgba(0, 0, 0, 0.08);
 }
 
 button.btn-tabela-excluir {
-    background-color: #FFF0ED;
+    background: linear-gradient(135deg, #FFF0ED 0%, #ffd6d0 100%);
     color: var(--terracota-escuro);
     border: 1px solid rgba(166, 93, 69, 0.3);
+    box-shadow: 0 3px 0 #d99688, 0 5px 10px rgba(166, 93, 69, 0.15);
 }
 
+/* Hover e Active dos botões de tabela */
 a.btn-tabela:hover {
-    background-color: #7BAA8A;
-    color: var(--verde-escuro);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #4f825e, 0 7px 12px rgba(27, 94, 58, 0.25);
+}
+a.btn-tabela:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #4f825e;
 }
 
 a.btn-tabela-secundario:hover {
-    background-color: #D6D0C4;
-    color: var(--texto);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #b3aba0, 0 7px 12px rgba(0, 0, 0, 0.12);
+}
+a.btn-tabela-secundario:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #b3aba0;
 }
 
 button.btn-tabela-excluir:hover {
-    background-color: var(--terracota);
+    background: linear-gradient(135deg, var(--terracota) 0%, #c46d52 100%);
     color: #FFF;
-    border-color: var(--terracota);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #8c4c37, 0 7px 12px rgba(166, 93, 69, 0.3);
+}
+button.btn-tabela-excluir:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #8c4c37;
 }
 
 /* --- LISTA DE DESPESAS (CARDS) --- */
@@ -581,7 +613,6 @@ button.btn-tabela-excluir:hover {
         align-items: flex-start;
     }
 
-    /* Ajuste dos cards de despesa no celular */
     .card-despesa {
         flex-direction: column;
         align-items: flex-start;
