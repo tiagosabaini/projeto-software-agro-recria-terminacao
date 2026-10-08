@@ -6,29 +6,29 @@
 }
 
 :root {
-    /* Paleta Profissional Clean Modern & Agro Tech */
-    --fundo-principal: #F8FAFC;
+    /* Paleta Estilo Hospitalar / Saúde & Clínica Tech */
+    --fundo-principal: #EBF3F5; /* Fundo estilo hospital / azulejo sanitário claro */
     --fundo-card: #FFFFFF;
-    --fundo-subtil: #F1F5F9;
+    --fundo-subtil: #E0F2FE;
     
-    /* Cores do Marca (Agro Tech) */
-    --verde-primario: #0D9488;
-    --verde-escuro: #0F766E;
-    --verde-suave: #CCFBF1;
-    --esmeralda: #10B981;
+    /* Cores de Destaque Clínico */
+    --azul-hospitalar: #0284C7;
+    --azul-escuro: #0369A1;
+    --azul-suave: #E0F2FE;
+    --verde-medico: #0D9488;
     
-    /* Tipografia e Neutros */
+    /* Tipografia e Neutros Sanitários */
     --texto-titulo: #0F172A;
     --texto-corpo: #334155;
     --texto-suave: #64748B;
-    --borda: #E2E8F0;
-    --borda-hover: #CBD5E1;
+    --borda: #CBD5E1;
+    --borda-hover: #38BDF8;
     
     /* Métrica, Layout e Elevação */
     --raio: 16px;
     --raio-peq: 10px;
-    --sombra-suave: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-    --sombra-hover: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+    --sombra-suave: 0 4px 20px -2px rgba(2, 132, 199, 0.08);
+    --sombra-hover: 0 16px 32px -6px rgba(2, 132, 199, 0.18);
     --transicao: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -51,9 +51,9 @@ h1, h2, h3, h4 {
     letter-spacing: -0.02em;
 }
 
-/* --- NAVBAR PROFISSIONAL --- */
+/* --- NAVBAR HOSPITALAR --- */
 .navbar {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     color: var(--texto-titulo);
@@ -62,11 +62,11 @@ h1, h2, h3, h4 {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    border-bottom: 1px solid var(--borda);
+    border-bottom: 2px solid var(--azul-suave);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.05);
 }
 
 .navbar-marca {
@@ -74,7 +74,7 @@ h1, h2, h3, h4 {
     font-weight: 800;
     font-size: 1.4rem;
     letter-spacing: -0.03em;
-    color: var(--verde-escuro);
+    color: var(--azul-escuro);
 }
 
 .navbar-links {
@@ -94,7 +94,7 @@ h1, h2, h3, h4 {
 }
 
 .navbar-links a:hover {
-    color: var(--verde-escuro);
+    color: var(--azul-escuro);
     background-color: var(--fundo-subtil);
 }
 
@@ -151,7 +151,7 @@ button.menu-mobile-btn {
     width: 100%;
 }
 
-/* --- CARDS DO MENU (ESTILO SAAS / DASHBOARD) --- */
+/* --- CARDS DO MENU (ESTILO CLÍNICO / HOSPITALAR) --- */
 .card-menu {
     background: var(--fundo-card);
     border: 1px solid var(--borda);
@@ -183,11 +183,11 @@ button.menu-mobile-btn {
 .card-menu:hover {
     transform: translateY(-4px);
     box-shadow: var(--sombra-hover);
-    border-color: transparent;
+    border-color: var(--borda-hover);
 }
 
 .card-menu:hover::after {
-    border-color: var(--verde-primario);
+    border-color: var(--azul-hospitalar);
 }
 
 .card-menu .icone {
@@ -199,12 +199,13 @@ button.menu-mobile-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: 14px;
     transition: var(--transicao);
 }
 
 .card-menu:hover .icone {
-    background-color: var(--verde-suave);
+    background-color: var(--azul-hospitalar);
+    color: #FFFFFF;
     transform: scale(1.08);
 }
 
@@ -221,7 +222,7 @@ button.menu-mobile-btn {
     line-height: 1.5;
 }
 
-/* --- FORMULÁRIOS CLEAN --- */
+/* --- FORMULÁRIOS CLEAN CLÍNICO --- */
 .form-caixa {
     background-color: var(--fundo-card);
     border: 1px solid var(--borda);
@@ -269,8 +270,8 @@ button.menu-mobile-btn {
 .campo input:focus,
 .campo select:focus {
     outline: none;
-    border-color: var(--verde-primario);
-    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    border-color: var(--azul-hospitalar);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 .form-linha {
@@ -280,10 +281,10 @@ button.menu-mobile-btn {
     align-items: end;
 }
 
-/* --- BOTÕES MODERNOS --- */
+/* --- BOTÕES CLÍNICOS --- */
 button,
 .botao {
-    background-color: var(--verde-primario);
+    background-color: var(--azul-hospitalar);
     color: #FFFFFF;
     border: none;
     padding: 12px 24px;
@@ -299,7 +300,7 @@ button,
     width: 100%;
     margin-top: 12px;
     transition: var(--transicao);
-    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
 }
 
 .botao {
@@ -308,9 +309,9 @@ button,
 
 button:hover,
 .botao:hover {
-    background-color: var(--verde-escuro);
+    background-color: var(--azul-escuro);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
 }
 
 button:active,
@@ -330,7 +331,7 @@ button:active,
 }
 
 .voltar:hover {
-    color: var(--verde-primario);
+    color: var(--azul-hospitalar);
 }
 
 /* --- TABELAS --- */
@@ -366,7 +367,7 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background-color: #F8FAFC;
+    background-color: #F1F5F9;
 }
 
 .grupo-botoes-tabela {
@@ -396,12 +397,12 @@ button.btn-tabela-excluir {
 }
 
 a.btn-tabela {
-    background-color: var(--verde-suave);
-    color: var(--verde-escuro);
+    background-color: var(--azul-suave);
+    color: var(--azul-escuro);
 }
 
 a.btn-tabela-secundario {
-    background-color: var(--fundo-subtil);
+    background-color: #F1F5F9;
     color: var(--texto-corpo);
 }
 
@@ -412,7 +413,7 @@ button.btn-tabela-excluir {
 }
 
 a.btn-tabela:hover {
-    background-color: var(--verde-primario);
+    background-color: var(--azul-hospitalar);
     color: #FFFFFF;
 }
 
@@ -441,7 +442,7 @@ button.btn-tabela-excluir:hover {
 .card-despesa {
     background-color: var(--fundo-card);
     border: 1px solid var(--borda);
-    border-left: 4px solid var(--verde-primario);
+    border-left: 4px solid var(--azul-hospitalar);
     border-radius: var(--raio-peq);
     padding: 16px 20px;
     display: flex;
@@ -453,7 +454,7 @@ button.btn-tabela-excluir:hover {
 
 .card-despesa:hover {
     border-color: var(--borda-hover);
-    border-left-color: var(--verde-escuro);
+    border-left-color: var(--azul-escuro);
     box-shadow: var(--sombra-hover);
 }
 
@@ -462,8 +463,8 @@ button.btn-tabela-excluir:hover {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 700;
-    color: var(--verde-escuro);
-    background-color: var(--verde-suave);
+    color: var(--azul-escuro);
+    background-color: var(--azul-suave);
     padding: 3px 8px;
     border-radius: 4px;
     align-self: flex-start;
