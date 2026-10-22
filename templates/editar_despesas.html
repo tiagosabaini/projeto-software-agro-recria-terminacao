@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Editar Despesa{% endblock %}
+{% block conteudo %}
+<h2>Editar Despesa</h2>
+<form action="{{ url_for('editar_despesa', id=despesa.id) }}" method="POST" class="form-caixa">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    
+    <div class="campo">
+        <label for="categoria">Categoria:</label>
+        <select id="categoria" name="categoria" required>
+            <option value="Veterinário/Vacina" {% if despesa.categoria == 'Veterinário/Vacina' %}selected{% endif %}>Veterinário/Vacina</option>
+            <option value="Frete" {% if despesa.categoria == 'Frete' %}selected{% endif %}>Frete</option>
+            <option value="Pastagem" {% if despesa.categoria == 'Pastagem' %}selected{% endif %}>Pastagem</option>
+            <option value="Sal/Proteinado" {% if despesa.categoria == 'Sal/Proteinado' %}selected{% endif %}>Sal/Proteinado</option>
+            <option value="Outros" {% if despesa.categoria == 'Outros' %}selected{% endif %}>Outros</option>
+        </select>
+    </div>
+
+    <div class="campo">
+        <label for="valor">Valor (R$):</label>
+        <input type="number" id="valor" name="valor" step="0.01" min="0.01" value="{{ despesa.valor }}" required>
+    </div>
+
+    <div class="campo">
+        <label for="observacao">Observação:</label>
+        <input type="text" id="observacao" name="observacao" value="{{ despesa.observacao or '' }}">
+    </div>
+
+    <button type="submit">Salvar Alteração</button>
+</form>
+<a class="voltar" href="{{ url_for('despesas') }}">← Voltar para Despesas</a>
+{% endblock %}
