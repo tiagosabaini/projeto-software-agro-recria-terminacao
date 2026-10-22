@@ -1,37 +1,50 @@
 {% extends "base.html" %}
-
-{% block titulo %}Atualizar Lote{% endblock %}
-
+{% block titulo %}Editar Lote{% endblock %}
 {% block conteudo %}
-<h2>Atualizar Estágio do Lote</h2>
+<h2>Editar Lote: {{ lote.identificacao }}</h2>
 
-<div class="form-caixa">
-    <p style="margin-bottom: 20px;">Você está atualizando o lote: <strong>{{ lote.identificacao }}</strong></p>
+<form action="{{ url_for('editar_lote', id=lote.id) }}" method="POST" class="form-caixa">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     
-    <form action="{{ url_for('editar_lote', id=lote.id) }}" method="POST">
-        <div class="form-linha">
-            <div class="campo">
-                <label for="categoria_animal">Nova Categoria:</label>
-                <select id="categoria_animal" name="categoria_animal" required>
-                    <option value="Bezerro" {% if lote.categoria_animal == 'Bezerro' %}selected{% endif %}>Bezerro(a) - Desmama</option>
-                    <option value="Garrote" {% if lote.categoria_animal == 'Garrote' %}selected{% endif %}>Garrote / Novilha</option>
-                    <option value="Boi Magro" {% if lote.categoria_animal == 'Boi Magro' %}selected{% endif %}>Boi Magro</option>
-                    <option value="Boi Gordo" {% if lote.categoria_animal == 'Boi Gordo' %}selected{% endif %}>Boi Gordo</option>
-                </select>
-            </div>
-    
-            <div class="campo">
-                <label for="fase_atual">Nova Fase:</label>
-                <select id="fase_atual" name="fase_atual" required>
-                    <option value="Recria" {% if lote.fase_atual == 'Recria' %}selected{% endif %}>Recria</option>
-                    <option value="Terminação" {% if lote.fase_atual == 'Terminação' %}selected{% endif %}>Terminação (Engorda)</option>
-                </select>
-            </div>
+    <div class="campo">
+        <label for="identificacao">Identificação do Lote:</label>
+        <input type="text" id="identificacao" name="identificacao" value="{{ lote.identificacao }}" required>
+    </div>
+
+    <div class="form-linha">
+        <div class="campo">
+            <label for="categoria_animal">Categoria do Animal:</label>
+            <select id="categoria_animal" name="categoria_animal" required>
+                <option value="Bezerro" {% if lote.categoria_animal == 'Bezerro' %}selected{% endif %}>Bezerro(a) - Desmama</option>
+                <option value="Garrote" {% if lote.categoria_animal == 'Garrote' %}selected{% endif %}>Garrote / Novilha</option>
+                <option value="Boi Magro" {% if lote.categoria_animal == 'Boi Magro' %}selected{% endif %}>Boi Magro</option>
+                <option value="Boi Gordo" {% if lote.categoria_animal == 'Boi Gordo' %}selected{% endif %}>Boi Gordo</option>
+            </select>
         </div>
-    
-        <button type="submit">Salvar Atualização</button>
-    </form>
-</div>
 
-<a class="voltar" href="{{ url_for('lotes') }}">← Voltar para a lista de lotes</a>
+        <div class="campo">
+            <label for="fase_atual">Fase da Operação:</label>
+            <select id="fase_atual" name="fase_atual" required>
+                <option value="Recria" {% if lote.fase_atual == 'Recria' %}selected{% endif %}>Recria</option>
+                <option value="Terminação" {% if lote.fase_atual == 'Terminação' %}selected{% endif %}>Terminação (Engorda)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-linha" style="margin-top: 15px;">
+        <div class="campo">
+            <label for="qtd_cabecas">Qtd. de Cabeças:</label>
+            <input type="number" id="qtd_cabecas" name="qtd_cabecas" value="{{ lote.qtd_cabecas }}" min="0" required>
+        </div>
+
+        <div class="campo">
+            <label for="custo_bezerro_unitario">Valor por Cabeça (R$):</label>
+            <input type="number" id="custo_bezerro_unitario" name="custo_bezerro_unitario" value="{{ lote.custo_bezerro_unitario }}" step="0.01" min="0" required>
+        </div>
+    </div>
+
+    <button type="submit">Salvar Alterações</button>
+</form>
+
+<a class="voltar" href="{{ url_for('lotes') }}">← Voltar para Lotes</a>
 {% endblock %}
