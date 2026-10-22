@@ -12,6 +12,7 @@
 <div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 24px;">
     <h3>1. Lançamento Direto de Despesa</h3>
     <form action="{{ url_for('despesas') }}" method="POST" class="form-linha">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="tipo_lancamento" value="direto">
         
         <div class="campo" style="flex: 2;">
@@ -46,6 +47,7 @@
 <div class="form-caixa" style="max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 24px;">
     <h3>2. Calculadora de Pastagem</h3>
     <form action="{{ url_for('despesas') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="tipo_lancamento" value="pastagem">
         
         <div class="campo">
@@ -84,6 +86,7 @@
         Lance o valor gasto com suplementação. O sistema calculará o custo exato por cabeça.
     </p>
     <form action="{{ url_for('despesas') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="tipo_lancamento" value="nutricao">
         
         <div class="campo">
@@ -138,7 +141,11 @@
             <div class="despesa-acao">
                 <strong class="despesa-valor">R$ {{ "%.2f"|format(despesa.valor) }}</strong>
                 
+                <!-- Botão de Edição incluído antes da exclusão -->
+                <a href="{{ url_for('editar_despesa', id=despesa.id) }}" class="btn-tabela-secundario" style="margin-bottom: 8px;">Editar</a>
+                
                 <form action="{{ url_for('excluir_despesa', id_despesa=despesa.id) }}" method="POST" class="form-excluir" onsubmit="return confirm('Deseja realmente apagar esta despesa?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                     <button type="submit" class="btn-tabela-excluir">Excluir</button>
                 </form>
             </div>
@@ -151,4 +158,7 @@
     </div>
 </div>
 
-{% endblock %}  
+<div style="text-align: center; margin-top: 32px;">
+    <a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+</div>
+{% endblock %}
