@@ -1,6 +1,3 @@
-Aqui está o código completo do **`app.py`** pronto para copiar e substituir no seu projeto, com o `@app.before_request` ajustado contra o erro 403 de CSRF, a chave de sessão estabilizada, a remoção da duplicação e todas as rotas de CRUD completas:
-
-```python
 import os
 import secrets
 from datetime import datetime, timedelta
