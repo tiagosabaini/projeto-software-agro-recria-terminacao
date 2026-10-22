@@ -22,8 +22,13 @@
             <a href="{{ url_for('despesas') }}">Despesas</a>
             <a href="{{ url_for('painel') }}">Painel</a>
 
-            <!-- Botão de Sair com o nome de quem está logado -->
-            <a href="{{ url_for('logout') }}" style="color: var(--terracota-escuro); font-weight: bold; margin-left: 20px; border-left: 2px solid var(--borda); padding-left: 20px;">
+            {% if session.get('nivel_acesso') == 'sysadmin' %}
+            <a href="{{ url_for('admin_cotacoes') }}" style="color: var(--verde-escuro); font-weight: bold; background-color: #E3F1E5;">
+                ⚙️ API Cotações
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" style="color: var(--terracota-escuro); font-weight: bold; margin-left: 15px; border-left: 2px solid var(--borda); padding-left: 15px;">
                 🚪 Sair ({{ session.get('nome_usuario') }})
             </a>
         </div>

@@ -1,28 +1,70 @@
 @startuml banco_dados
-title Modelo de Banco de Dados (Entidade-Relacionamento)
+title Modelo de Banco de Dados (Entidade-Relacionamento) - Sistema Agro 2026
 skinparam linetype ortho
 
-entity "Lote" as lote {
-* id_lote : int <> --
-* identificacao : varchar
-* fase_atual : varchar (Recria/Terminação)
-* data_inicio : date
+entity "usuarios" as usuarios {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * nome : TEXT
+  * usuario : TEXT <<UNIQUE>>
+  * senha : TEXT (Hash PBKDF2/scrypt)
+  * nivel_acesso : TEXT ('sysadmin' | 'comum')
 }
 
-entity "Despesa" as despesa {
-* id_despesa : int <> --
-* id_lote : int <> * categoria : varchar (Ração, Vacina)
-* valor : decimal
-* data_lancamento : date
+entity "cotacoes" as cotacoes {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * frigorifico : TEXT <<UNIQUE>>
+  * preco : REAL (Preço da @ em R$)
 }
 
-entity "Pesagem" as pesagem {
-* id_pesagem : int <> --
-* id_lote : int <> * peso_registrado : decimal
-* data_pesagem : date
+entity "lotes" as lotes {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * identificacao : TEXT
+  * fase_atual : TEXT ('Recria' | 'Terminação')
+  * categoria_animal : TEXT
+  * data_inicio : TEXT (YYYY-MM-DD)
+  * qtd_cabecas : INTEGER
+  * custo_bezerro_unitario : REAL
+  * custo_total_compra : REAL
+  * valor_venda_total : REAL
+  * total_arrobas_vendidas : REAL
+  * status : TEXT ('Em Andamento' | 'Finalizado')
+  * frigorifico_comprador : TEXT
+  * qtd_vendida_total : INTEGER
 }
 
-lote ||--o{ despesa : "possui"
-lote ||--o{ pesagem : "registra"
+entity "despesas" as despesas {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * lote_id : INTEGER <<FK>>
+  * categoria : TEXT
+  * valor : REAL
+  * observacao : TEXT
+}
+
+entity "pesagens" as pesagens {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * lote_id : INTEGER <<FK>>
+  * peso : REAL
+  * data : TEXT (YYYY-MM-DD)
+}
+
+entity "consumo_sal" as consumo_sal {
+  * id : INTEGER <<PK, AUTOINCREMENT>>
+  --
+  * lote_id : INTEGER <<FK>>
+  * data_registro : TIMESTAMP
+  * qtd_sacos : REAL
+  * peso_saco_kg : REAL
+  * dias : INTEGER
+  * qtd_bois : INTEGER
+  * gramas_cab_dia : REAL
+}
+
+lotes ||--o{ despesas : "possui (CASCADE)"
+lotes ||--o{ pesagens : "registra (CASCADE)"
+lotes ||--o{ consumo_sal : "monitora (CASCADE)"
 @enduml
-
