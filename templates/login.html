@@ -75,7 +75,6 @@
         <h2 style="color: var(--verde-escuro); margin-bottom: 5px; font-size: 1.8rem;">🐄 Recria & Terminação</h2>
         <p style="color: #666; margin-bottom: 30px;">Acesso Restrito ao Sistema</p>
 
-        <!-- Área que exibe a mensagem de erro se errar a senha -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -85,6 +84,7 @@
         {% endwith %}
 
         <form action="{{ url_for('login') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <div style="text-align: left;">
                 <label style="font-weight: bold; color: var(--verde-escuro);">Usuário</label>
                 <input type="text" name="usuario" placeholder="Digite seu usuário" required>
@@ -95,13 +95,6 @@
             
             <button type="submit">Entrar no Sistema</button>
         </form>
-        
-        <!-- Dica de acesso para facilitar a correção da professora -->
-        <div style="font-size: 0.9rem; color: var(--texto); margin-top: 25px; text-align: left; background-color: #FAFAFA; padding: 15px; border-radius: 8px; border: 1px dashed var(--borda);">
-            <strong>📋 Dados de Acesso (Teste):</strong><br><br>
-            👤 <b>Usuário:</b> admin <br>
-            🔑 <b>Senha:</b> 1234
-        </div>
     </div>
 </body>
 </html>

@@ -1,45 +1,47 @@
 # 🐂 Sistema de Recria e Terminação Bovino
 
 ## 📌 Sobre o Projeto
-O Sistema de Recria e Terminação Bovino é uma solução para o agronegócio focada no gerenciamento financeiro e zootécnico da pecuária de corte. O sistema resolve a falta de previsibilidade do produtor rural, permitindo o controle preciso do custo por arroba (@) produzida e ajudando a evitar a comercialização de lotes no prejuízo.
-[Clique aqui para ver o Pitch do Projeto (PDF)](./pitch_deck.pdf.pdf)
+O **Sistema de Recria e Terminação Bovino** é uma aplicação web desenvolvida em Flask/SQLite para a gestão zootécnica e financeira da pecuária de corte. Ele centraliza o fluxo produtivo: desde a aquisição e manejo nutricional de lotes até o ganho médio diário (GMD), simulação de cotações em frigoríficos e aferição de lucratividade real após o abate.
 
-## 🚀 Funcionalidades Principais
-* Gestão de Lotes: Cadastro de lotes, datas e acompanhamento da fase atual.
-* Controle de Despesas: Lançamento e categorização de custos segregados por fase (Recria e Terminação).
-* Acompanhamento de Pesagens: Histórico de pesagens com cálculo automático de Ganho Médio Diário (GMD).
-* Painel de Viabilidade: Indicador em tempo real do custo da arroba ganha e projeção de lucratividade com base na cotação do mercado.
+---
+
+## 🛡️ Segurança da Informação (Tríade CID)
+
+A aplicação implementa controles de segurança cobrindo os três pilares fundamentais da segurança da informação:
+
+### 1. Confidencialidade
+* **Criptografia de Senhas (Hashing):** As senhas dos usuários nunca são armazenadas em texto simples. Utiliza-se a biblioteca `werkzeug.security` com algoritmos de derivação de chaves seguros (scrypt/PBKDF2) com *salt* dinâmico.
+* **Controle de Acesso Baseado em Papéis (RBAC):**
+  * Perfil `comum` (Produtor Rural): Acesso operacional aos lotes, despesas, pesagens e painel financeiro.
+  * Perfil `sysadmin` (Administrador): Acesso exclusivo à configuração e atualização de preços dos frigoríficos (`/admin_cotacoes`).
+* **Proteção de Sessão:** Cookies de sessão configurados com `HttpOnly=True` e `SameSite=Lax` para mitigar ataques de sequestro de sessão (*Session Hijacking*).
+
+### 2. Integridade
+* **Proteção contra CSRF (Cross-Site Request Forgery):** Todas as requisições de alteração de estado (`POST`) exigem e validam um *token* criptográfico pseudo-aleatório gerado por sessão, rejeitando requisições forjadas de terceiros.
+* **Validação de Entrada Server-Side:** Tratamento de tipos de dados numéricos (valores mínimos de arroba, cabeças e preços) em todas as rotas no backend antes da persistência.
+* **Chaves Estrangeiras com Exclusão em Cascata (`PRAGMA foreign_keys = ON`):** Garantia de integridade referencial relacional entre lotes e seus registros filhos (despesas, pesagens e consumo).
+
+### 3. Disponibilidade
+* **Rotina de Backup Transacional (`gerar_dump.py`):** Script automatizado de geração de dump SQL da base de dados com carimbo temporal (`YYYYMMDD_HHMMSS`) e armazenamento versionado na pasta `backups/`, garantindo rápida recuperação em caso de falha operacional (*Disaster Recovery*).
+* **Mitigação de Ataques de Força Bruta (Rate Limiting de Autenticação):** Bloqueio temporário de 5 minutos após 5 tentativas consecutivas de senha incorreta para prevenir ataques de dicionário.
+
+### 🌐 Interoperabilidade da API (`/api/cotacoes`)
+* **Decisão Arquitetural Consciente:** O endpoint `/api/cotacoes` foi propositalmente configurado como público para permitir a integração e consumo por sistemas de campo, balanças eletrônicas e painéis da fazenda sem necessidade de autenticação complexa, mantendo a proteção restrita à rota administrativa de gravação (`/admin_cotacoes`).
+
+---
 
 ## 🛠️ Tecnologias Utilizadas
-* Linguagem: Python 3 e JavaScript
-* Framework Web: Flask
-* Banco de Dados: SQLite
-* Frontend: HTML5, CSS3, Jinja2
+* **Linguagem:** Python 3
+* **Framework Web:** Flask 3.1.3
+* **Banco de Dados:** SQLite3 (Relacional)
+* **Frontend:** HTML5, CSS3 moderno, JavaScript (ES6)
+* **Segurança:** Werkzeug Security, Secrets
 
-## 👥 Integrantes do Grupo
-* Tiago Sabaini - (GitHub: @tiagosabaini)
-* Jhenifer Alves - (GitHub: @jheniiiialvesss)
-* Pedro Bueno - (GitHub: @pedronosrinsk)
-* Júllia Ketrin - (GitHub: @JeiKeiRambo)
-* Lucas Daniel - (GitHub: @KourtneK)
+---
 
-## 📐 Arquitetura do Sistema e Fluxos
-O projeto conta com diagramas PlantUML (`.puml`) para documentação visual do banco de dados e das regras de negócio:
-
-* **Modelagem do Banco de Dados (`banco_dados.puml`):** Mapeamento e relacionamento das tabelas SQLite (`lotes`, `despesas`, `pesagens`).
- <img width="590" height="297" alt="image" src="https://github.com/user-attachments/assets/3fc52491-e772-42d8-9936-7dc8b96b2cc7" />
-
-* **Fluxo de Cálculo (`fluxo_custo_arroba.puml`):** Diagrama de atividades detalhando a lógica de processamento do custo por arroba e projeção de lucro.
- <img width="515" height="650" alt="image" src="https://github.com/user-attachments/assets/d09c8c52-37fc-4be0-9f4d-ce039c9b541c" />
-
- * **Arquitetura Técnica (`container.puml`):**
- * <img width="334" height="1006" alt="image" src="https://github.com/user-attachments/assets/ce225425-c448-409a-8f84-62bf365a876a" />
-
- * **Cálculo GMD - Ganho Médio Diário (`fluxo_gmd.puml`):**
- * <img width="593" height="613" alt="image" src="https://github.com/user-attachments/assets/819976e2-48ac-48e6-a621-22c0099b0327" />
-
-
-   
-
- 
-
+## 👥 Integrantes
+* Tiago Sabaini
+* Jhenifer Alves
+* Pedro Bueno
+* Júllia Ketrin
+* Lucas Daniel

@@ -19,6 +19,7 @@
     {% endwith %}
 
     <form action="{{ url_for('admin_cotacoes') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         
         <h3 style="margin-bottom: 20px; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">Valores Atuais da Arroba (@)</h3>
         
@@ -36,7 +37,7 @@
     </form>
     
     <div style="margin-top: 30px; font-size: 0.85rem; color: #888; background-color: #FAFAFA; padding: 15px; border-radius: 8px;">
-        <strong>🔗 Endpoint Gerado:</strong> O seu sistema agora possui um endpoint JSON rodando em <code>/api/cotacoes</code> que o frontend consome automaticamente no Painel de Lucros.
+        <strong>🔗 Endpoint Gerado:</strong> O seu sistema possui um endpoint JSON rodando em <code>/api/cotacoes</code> que o frontend consome automaticamente no Painel de Lucros[cite: 4].
     </div>
 </div>
 

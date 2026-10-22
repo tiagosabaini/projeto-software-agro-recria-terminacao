@@ -6,6 +6,8 @@
 <h2>Cadastro de Novo Lote</h2>
 
 <form action="{{ url_for('cadastro') }}" method="POST" class="form-caixa">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    
     <div class="campo">
         <label for="identificacao">Identificação do Lote:</label>
         <input type="text" id="identificacao" name="identificacao" placeholder="Ex: Lote 13 Nelore Brando" required>
