@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block titulo %}Editar Pesagem{% endblock %}
+{% block conteudo %}
+<h2>Editar Registro de Pesagem</h2>
+<form action="{{ url_for('editar_pesagem', id=pesagem.id) }}" method="POST" class="form-caixa">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    
+    <div class="campo">
+        <label for="peso">Peso (kg):</label>
+        <input type="number" id="peso" name="peso" step="0.01" min="0" value="{{ pesagem.peso }}" required>
+    </div>
+
+    <div class="campo">
+        <label for="data">Data:</label>
+        <input type="date" id="data" name="data" value="{{ pesagem.data }}" required>
+    </div>
+
+    <button type="submit">Salvar Alteração</button>
+</form>
+<a class="voltar" href="{{ url_for('pesagem') }}">← Voltar para Pesagens</a>
+{% endblock %}
