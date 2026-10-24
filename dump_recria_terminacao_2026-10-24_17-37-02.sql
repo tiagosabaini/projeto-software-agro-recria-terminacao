@@ -10,6 +10,7 @@ CREATE TABLE consumo_sal (
                     gramas_cab_dia REAL,
                     FOREIGN KEY(lote_id) REFERENCES lotes(id) ON DELETE CASCADE
                 );
+INSERT INTO "consumo_sal" VALUES(1,1,'2026-10-24 20:35:55',2.0,25.0,3,5,3.333333333333333485e+03);
 CREATE TABLE cotacoes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             frigorifico TEXT UNIQUE,
@@ -26,6 +27,8 @@ CREATE TABLE despesas (
                     observacao TEXT,
                     FOREIGN KEY(lote_id) REFERENCES lotes(id) ON DELETE CASCADE
                 );
+INSERT INTO "despesas" VALUES(1,1,'Veterinário/Vacina',2222.0,'');
+INSERT INTO "despesas" VALUES(2,1,'Pastagem',1250.0,'Pasto: 5 cab. x 5.0 meses x R$ 50.00/mês');
 CREATE TABLE lotes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     identificacao TEXT NOT NULL,
@@ -38,8 +41,8 @@ CREATE TABLE lotes (
                     valor_venda_total REAL,
                     total_arrobas_vendidas REAL,
                     status TEXT DEFAULT 'Em Andamento'
-                , frigorifico_comprador TEXT);
-INSERT INTO "lotes" VALUES(1,'gf','Recria','Bezerro',NULL,5,3.0,15.0,NULL,NULL,'Em Andamento',NULL);
+                , frigorifico_comprador TEXT, qtd_vendida_total INTEGER DEFAULT 0);
+INSERT INTO "lotes" VALUES(1,'gf','Recria','Bezerro',NULL,5,3.0,15.0,NULL,NULL,'Em Andamento',NULL,0);
 CREATE TABLE pesagens (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     lote_id INTEGER,
@@ -47,6 +50,7 @@ CREATE TABLE pesagens (
                     data TEXT,
                     FOREIGN KEY(lote_id) REFERENCES lotes(id) ON DELETE CASCADE
                 );
+INSERT INTO "pesagens" VALUES(1,1,22.0,'2222-02-11');
 CREATE TABLE usuarios (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nome TEXT,
@@ -60,4 +64,7 @@ DELETE FROM "sqlite_sequence";
 INSERT INTO "sqlite_sequence" VALUES('usuarios',2);
 INSERT INTO "sqlite_sequence" VALUES('cotacoes',3);
 INSERT INTO "sqlite_sequence" VALUES('lotes',1);
+INSERT INTO "sqlite_sequence" VALUES('pesagens',1);
+INSERT INTO "sqlite_sequence" VALUES('consumo_sal',1);
+INSERT INTO "sqlite_sequence" VALUES('despesas',2);
 COMMIT;

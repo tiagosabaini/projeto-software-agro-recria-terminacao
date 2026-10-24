@@ -1,70 +1,67 @@
-@startuml banco_dados
-title Modelo de Banco de Dados (Entidade-Relacionamento) - Sistema Agro 2026
-skinparam linetype ortho
-
-entity "usuarios" as usuarios {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+@startuml
+entity "lotes" {
+  * id : INTEGER <<PK>>
   --
-  * nome : TEXT
-  * usuario : TEXT <<UNIQUE>>
-  * senha : TEXT (Hash PBKDF2/scrypt)
-  * nivel_acesso : TEXT ('sysadmin' | 'comum')
+  identificacao : TEXT
+  fase_atual : TEXT
+  categoria_animal : TEXT
+  data_inicio : TEXT
+  qtd_cabecas : INTEGER
+  custo_bezerro_unitario : REAL
+  custo_total_compra : REAL
+  valor_venda_total : REAL
+  total_arrobas_vendidas : REAL
+  status : TEXT
+  frigorifico_comprador : TEXT
+  qtd_vendida_total : INTEGER
 }
 
-entity "cotacoes" as cotacoes {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+entity "despesas" {
+  * id : INTEGER <<PK>>
   --
-  * frigorifico : TEXT <<UNIQUE>>
-  * preco : REAL (Preço da @ em R$)
+  lote_id : INTEGER <<FK>>
+  categoria : TEXT
+  valor : REAL
+  observacao : TEXT
 }
 
-entity "lotes" as lotes {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+entity "pesagens" {
+  * id : INTEGER <<PK>>
   --
-  * identificacao : TEXT
-  * fase_atual : TEXT ('Recria' | 'Terminação')
-  * categoria_animal : TEXT
-  * data_inicio : TEXT (YYYY-MM-DD)
-  * qtd_cabecas : INTEGER
-  * custo_bezerro_unitario : REAL
-  * custo_total_compra : REAL
-  * valor_venda_total : REAL
-  * total_arrobas_vendidas : REAL
-  * status : TEXT ('Em Andamento' | 'Finalizado')
-  * frigorifico_comprador : TEXT
-  * qtd_vendida_total : INTEGER
+  lote_id : INTEGER <<FK>>
+  peso : REAL
+  data : TEXT
 }
 
-entity "despesas" as despesas {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+entity "consumo_sal" {
+  * id : INTEGER <<PK>>
   --
-  * lote_id : INTEGER <<FK>>
-  * categoria : TEXT
-  * valor : REAL
-  * observacao : TEXT
+  lote_id : INTEGER <<FK>>
+  data_registro : TIMESTAMP
+  qtd_sacos : REAL
+  peso_saco_kg : REAL
+  dias : INTEGER
+  qtd_bois : INTEGER
+  gramas_cab_dia : REAL
 }
 
-entity "pesagens" as pesagens {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+entity "usuarios" {
+  * id : INTEGER <<PK>>
   --
-  * lote_id : INTEGER <<FK>>
-  * peso : REAL
-  * data : TEXT (YYYY-MM-DD)
+  nome : TEXT
+  usuario : TEXT <<UNIQUE>>
+  senha : TEXT
+  nivel_acesso : TEXT
 }
 
-entity "consumo_sal" as consumo_sal {
-  * id : INTEGER <<PK, AUTOINCREMENT>>
+entity "cotacoes" {
+  * id : INTEGER <<PK>>
   --
-  * lote_id : INTEGER <<FK>>
-  * data_registro : TIMESTAMP
-  * qtd_sacos : REAL
-  * peso_saco_kg : REAL
-  * dias : INTEGER
-  * qtd_bois : INTEGER
-  * gramas_cab_dia : REAL
+  frigorifico : TEXT <<UNIQUE>>
+  preco : REAL
 }
 
-lotes ||--o{ despesas : "possui (CASCADE)"
-lotes ||--o{ pesagens : "registra (CASCADE)"
-lotes ||--o{ consumo_sal : "monitora (CASCADE)"
+lotes ||--o{ despesas : possui
+lotes ||--o{ pesagens : possui
+lotes ||--o{ consumo_sal : consome
 @enduml

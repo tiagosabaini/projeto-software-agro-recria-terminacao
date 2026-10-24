@@ -5,6 +5,8 @@ from flask import Flask, redirect, render_template, request, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from config_banco import conectar, criar_tabelas
 
+
+
 app = Flask(__name__)
 
 # Chave secreta estável (evita invalidar tokens CSRF e sessões ao reiniciar o servidor)
@@ -66,7 +68,7 @@ def configurar_sistema():
     finally:
         conexao.close()
 
-configurar_sistema()
+
 
 # Injeta automaticamente o token CSRF em todos os templates Jinja2
 @app.context_processor
@@ -539,3 +541,4 @@ def painel():
 if __name__ == '__main__':
     # Debug desativado por padrão para atender os requisitos de produção/segurança
     app.run(debug=os.getenv('FLASK_DEBUG', 'False').lower() == 'true')
+
