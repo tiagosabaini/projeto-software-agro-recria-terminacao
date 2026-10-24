@@ -10,8 +10,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-marca">🐂 Recria &amp; Terminação</div>
+    <nav class="navbar" style="padding: 10px 24px; align-items: center;">
+        <div class="navbar-marca" style="display: flex; align-items: center;">
+            <!-- Apenas a logo de forma sofisticada e sem textos extras ou emojis redundantes -->
+            <a href="{{ url_for('index') }}" style="display: flex; align-items: center; border: none; padding: 0; background: none;">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Recria & Terminação" style="height: 75px; width: auto; object-fit: contain;">
+    </a>
+        </div>
         <button class="menu-mobile-btn" onclick="toggleMenu()">☰</button>
         <div class="navbar-links">
             <a href="{{ url_for('lotes') }}">Lotes</a>
@@ -23,7 +28,7 @@
             <a href="{{ url_for('painel') }}">Painel</a>
 
             {% if session.get('nivel_acesso') == 'sysadmin' %}
-            <a href="{{ url_for('admin_cotacoes') }}" style="color: var(--verde-escuro); font-weight: bold; background-color: #E3F1E5;">
+            <a href="{{ url_for('admin_cotacoes') }}" style="color: var(--verde-escuro); font-weight: bold; background-color: #E3F1E5; border-radius: var(--raio-peq);">
                 ⚙️ API Cotações
             </a>
             {% endif %}

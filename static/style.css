@@ -20,8 +20,33 @@ body { font-family: 'Nunito Sans', Arial, sans-serif; background-color: var(--cr
 h1, h2, h3, h4 { font-family: 'Baloo 2', 'Nunito Sans', sans-serif; color: var(--verde-escuro); font-weight: 700; text-align: center; margin-bottom: 24px; }
 
 /* --- NAVBAR --- */
-.navbar { background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: var(--verde-escuro); padding: 16px 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 1px solid rgba(226, 221, 208, 0.5); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-.navbar-marca { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.4rem; letter-spacing: -0.5px; }
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--creme);
+    padding: 12px 40px;
+    border-bottom: 2px solid var(--borda);
+    position: relative;
+    z-index: 100;
+}
+
+.navbar-marca {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-marca img {
+    max-height: 85px;
+    width: auto;
+    transition: transform 0.2s ease;
+}
+
+.navbar-marca img:hover {
+    transform: scale(1.02); /* Feedback visual elegante e suave ao passar o mouse */
+}
 .navbar-links { display: flex; gap: 24px; align-items: center; }
 .navbar-links a { color: var(--texto-suave); text-decoration: none; font-size: 0.95rem; font-weight: 600; padding: 8px 12px; border-radius: var(--raio-peq); transition: var(--transicao); }
 .navbar-links a:hover { color: var(--verde-escuro); background-color: rgba(143, 185, 155, 0.15); }

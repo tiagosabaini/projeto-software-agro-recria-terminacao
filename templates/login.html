@@ -72,8 +72,10 @@
 </head>
 <body>
     <div class="login-caixa">
-        <h2 style="color: var(--verde-escuro); margin-bottom: 5px; font-size: 1.8rem;">🐄 Recria & Terminação</h2>
-        <p style="color: #666; margin-bottom: 30px;">Acesso Restrito ao Sistema</p>
+        <!-- A Logo assume o papel principal com grande destaque, removendo texto e emoji anteriores -->
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Recria & Terminação - Sistema de Gestão de Lotes" style="width: 280px; max-width: 100%; height: auto; margin-bottom: 24px; display: block; margin-left: auto; margin-right: auto;">
+        
+        <p style="color: #666; margin-bottom: 30px; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; border-top: 1px solid var(--borda); padding-top: 15px;">Acesso Restrito ao Sistema</p>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
