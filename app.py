@@ -21,15 +21,11 @@ def configurar_sistema():
     try:
         with conexao:
             # 1. Tabela de Usuários com Nível de Acesso (RBAC)
-            conexao.execute('''
-                CREATE TABLE IF NOT EXISTS usuarios (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    nome TEXT,
-                    usuario TEXT UNIQUE,
-                    senha TEXT,
-                    nivel_acesso TEXT
-                )
-            ''')
+            conexao.execute(
+                'INSERT INTO usuarios (nome, usuario, senha, nivel_acesso) VALUES (?, ?, ?, ?)',
+                ('Elizeu', 'elizeu', generate_password_hash(senha_produtor_raw), 'comum')
+            )
+            
             if not conexao.execute('SELECT 1 FROM usuarios LIMIT 1').fetchone():
                 senha_produtor_raw = os.getenv('SENHA_PRODUTOR_INICIAL', '1234')
                 senha_admin_raw = os.getenv('SENHA_ADMIN_INICIAL', 'admin2026')
@@ -406,7 +402,7 @@ def pesagem():
 
     conexao.close()
     return render_template('pesagem.html', lotes=lotes, pesagens=pesagens_processadas, lote_selecionado=lote_selecionado)
-    
+
 @app.route('/editar_pesagem/<int:id>', methods=['GET', 'POST'])
 def editar_pesagem(id):
     conexao = conectar()
