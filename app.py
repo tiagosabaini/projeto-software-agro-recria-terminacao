@@ -304,7 +304,7 @@ def despesas():
             return redirect(url_for('despesas'))
 
         despesas_lista = conexao.execute('''
-            SELECT despesas.*, lotes.identificacao 
+            SELECT despesas.*, lotes.identificacao, lotes.qtd_cabecas 
             FROM despesas JOIN lotes ON despesas.lote_id = lotes.id 
             ORDER BY despesas.id DESC
         ''').fetchall()
@@ -341,55 +341,72 @@ def excluir_despesa(id_despesa):
     return redirect(url_for('despesas'))
 
 # === CRUD: PESAGENS ===
+from datetime import datetime
+
 @app.route('/pesagem', methods=['GET', 'POST'])
 def pesagem():
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+
     conexao = conectar()
-    try:
-        if request.method == 'POST':
-            lote_id = request.form.get('lote_id')
-            peso = max(0.0, float(request.form.get('peso', 0)))
-            data = request.form.get('data')
-            with conexao:
-                conexao.execute('INSERT INTO pesagens (lote_id, peso, data) VALUES (?, ?, ?)',
-                                (lote_id, peso, data))
-            return redirect(url_for('pesagem'))
 
-        registros = conexao.execute('''
-            SELECT pesagens.*, lotes.identificacao
-            FROM pesagens JOIN lotes ON pesagens.lote_id = lotes.id
-        ''').fetchall()
-        lotes_ativos = conexao.execute('SELECT * FROM lotes WHERE status = "Em Andamento"').fetchall()
-    finally:
-        conexao.close()
+    if request.method == 'POST':
+        lote_id = request.form.get('lote_id')
+        peso = float(request.form.get('peso', 0))
+        data = request.form.get('data')
+        
+        try:
+            conexao.execute('INSERT INTO pesagens (lote_id, peso, data) VALUES (?, ?, ?)', (lote_id, peso, data))
+            conexao.commit()
+        finally:
+            conexao.close()
+            
+        return redirect(url_for('pesagem', lote_id=lote_id))
 
-    registros_ordenados = sorted(registros, key=lambda r: r['data'])
-    lista_pesagens = []
-    anterior_por_lote = {}
+    # Carregamento da página e cálculo do GMD
+    lotes = conexao.execute('SELECT id, identificacao FROM lotes WHERE status != "Finalizado"').fetchall()
+    lote_id = request.args.get('lote_id')
+    
+    lote_selecionado = None
+    pesagens_processadas = []
 
-    for r in registros_ordenados:
-        anterior = anterior_por_lote.get(r['lote_id'])
-        gmd = None
-        if anterior is not None:
-            try:
-                data_atual = datetime.strptime(r['data'], '%Y-%m-%d')
-                data_ant = datetime.strptime(anterior['data'], '%Y-%m-%d')
-                dias = (data_atual - data_ant).days
+    if lote_id:
+        lote_selecionado = conexao.execute('SELECT * FROM lotes WHERE id = ?', (lote_id,)).fetchone()
+        
+        # Busca do mais antigo para o mais novo para calcular o ganho progressivo
+        pesagens_raw = conexao.execute('''
+            SELECT id, peso, data 
+            FROM pesagens 
+            WHERE lote_id = ? 
+            ORDER BY data ASC
+        ''', (lote_id,)).fetchall()
+
+        qtd_cabecas = lote_selecionado['qtd_cabecas'] if lote_selecionado and lote_selecionado['qtd_cabecas'] else 1
+
+        for i in range(len(pesagens_raw)):
+            p_atual = dict(pesagens_raw[i])
+            p_atual['gmd_lote'] = None
+            p_atual['gmd_cabeca'] = None
+            
+            if i > 0:
+                p_anterior = pesagens_raw[i-1]
+                data_atual = datetime.strptime(p_atual['data'], '%Y-%m-%d')
+                data_anterior = datetime.strptime(p_anterior['data'], '%Y-%m-%d')
+                dias = (data_atual - data_anterior).days
+                
                 if dias > 0:
-                    gmd = (r['peso'] - anterior['peso']) / dias
-            except:
-                pass
-        lista_pesagens.append({
-            'id': r['id'],
-            'identificacao': r['identificacao'],
-            'data': r['data'],
-            'peso': r['peso'],
-            'gmd': gmd
-        })
-        anterior_por_lote[r['lote_id']] = r
+                    ganho_peso = p_atual['peso'] - p_anterior['peso']
+                    p_atual['gmd_lote'] = ganho_peso / dias
+                    p_atual['gmd_cabeca'] = (ganho_peso / dias) / qtd_cabecas
+            
+            pesagens_processadas.append(p_atual)
+        
+        # Inverte para exibir a pesagem mais recente no topo da tabela
+        pesagens_processadas.reverse()
 
-    lista_pesagens.reverse()
-    return render_template('pesagem.html', pesagens=lista_pesagens, lotes=lotes_ativos)
-
+    conexao.close()
+    return render_template('pesagem.html', lotes=lotes, pesagens=pesagens_processadas, lote_selecionado=lote_selecionado)
+    
 @app.route('/editar_pesagem/<int:id>', methods=['GET', 'POST'])
 def editar_pesagem(id):
     conexao = conectar()

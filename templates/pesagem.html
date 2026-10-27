@@ -1,78 +1,102 @@
 {% extends "base.html" %}
-
-{% block titulo %}Pesagem{% endblock %}
-
+{% block titulo %}Controle de Pesagem{% endblock %}
 {% block conteudo %}
-<h2>Controle de Pesagem</h2>
+<h2 style="text-align: center; color: var(--verde-escuro);">Controle de Pesagem</h2>
 
-<form action="{{ url_for('pesagem') }}" method="POST" class="form-caixa form-linha">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    
+<!-- Seleção do Lote com Alinhamento Corrigido -->
+<form action="{{ url_for('pesagem') }}" method="GET" class="form-caixa" style="margin-bottom: 24px;">
     <div class="campo">
-        <label for="lote_id">Lote</label>
-        <select name="lote_id" id="lote_id" required>
-            {% for lote in lotes %}
-            <option value="{{ lote.id }}">{{ lote.identificacao }}</option>
-            {% endfor %}
-        </select>
+        <label style="font-weight: bold; color: var(--verde-escuro);">Selecione o Lote para Análise:</label>
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+            <select name="lote_id" required style="flex: 1; margin-bottom: 0;">
+                <option value="">Escolha um lote em andamento...</option>
+                {% for lote in lotes %}
+                <option value="{{ lote.id }}" {% if lote_selecionado and lote.id == lote_selecionado.id %}selected{% endif %}>
+                    {{ lote.identificacao }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" style="width: auto; padding: 0 24px; margin-bottom: 0; height: 42px;">Filtrar</button>
+        </div>
     </div>
-
-    <div class="campo">
-        <label for="peso">Peso (kg)</label>
-        <input type="number" name="peso" id="peso" step="0.01" min="0" required>
-    </div>
-
-    <div class="campo">
-        <label for="data">Data</label>
-        <input type="date" name="data" id="data" required>
-    </div>
-
-    <button type="submit">Registrar Pesagem</button>
 </form>
 
-<div style="overflow-x: auto; width: 100%;">
-    <table>
+{% if lote_selecionado %}
+<!-- Registro de Novo Peso (Layout Centralizado e Lado a Lado) -->
+<form action="{{ url_for('pesagem') }}" method="POST" class="form-caixa" style="border-top: 4px solid var(--verde-salvia);">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="lote_id" value="{{ lote_selecionado.id }}">
+    
+    <div style="width: 100%; text-align: center; margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h3 style="margin: 0; color: var(--verde-escuro); font-size: 1.4rem; text-align: center;">Adicionar Pesagem: {{ lote_selecionado.identificacao }}</h3>
+        <p style="color: var(--texto-suave); font-size: 0.95rem; margin-top: 4px; text-align: center;">Quantidade: {{ lote_selecionado.qtd_cabecas }} animais</p>
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-bottom: 24px;">
+        <div class="campo" style="flex: 1; margin: 0;">
+            <label style="font-weight: bold;">Peso Total do Lote (kg)</label>
+            <input type="number" step="0.01" name="peso" placeholder="Ex: 8500.50" required style="width: 100%;">
+        </div>
+        <div class="campo" style="flex: 1; margin: 0;">
+            <label style="font-weight: bold;">Data da Pesagem</label>
+            <input type="date" name="data" required style="width: 100%;">
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <button type="submit" style="width: 50%; padding: 12px; font-size: 1.05rem;">Registar Pesagem</button>
+    </div>
+</form>
+
+<!-- Histórico com Colunas de GMD -->
+<div class="tabela-container" style="margin-top: 32px;">
+    <table class="tabela-dados">
         <thead>
             <tr>
-                <th>Lote</th>
                 <th>Data</th>
-                <th>Peso (kg)</th>
-                <th>GMD desde a última (kg/dia)</th>
+                <th>Peso Lote (kg)</th>
+                <th>Média Cab. (kg)</th>
+                <th>GMD Lote</th>
+                <th>GMD Cab.</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
             {% for p in pesagens %}
             <tr>
-                <td><strong>{{ p.identificacao }}</strong></td>
-                <td>{{ p.data | data_br }}</td>
-                <td>{{ "%.2f"|format(p.peso) }} kg</td>
+                <td>{{ p.data }}</td>
+                <td style="font-weight: bold;">{{ "%.2f"|format(p.peso) }}</td>
                 <td>
-                    {% if p.gmd is not none %}
-                        {{ "%.3f"|format(p.gmd) }}
-                        {% if p.gmd >= 0.8 %}✔{% else %}⚠{% endif %}
+                    {% if lote_selecionado.qtd_cabecas %}
+                        {{ "%.2f"|format(p.peso / lote_selecionado.qtd_cabecas) }}
                     {% else %}
-                        —
+                        ---
                     {% endif %}
                 </td>
+                
+                <!-- Exibição Condicional do GMD (Destacado em Verde se for positivo) -->
+                <td style="color: {% if p.gmd_lote and p.gmd_lote > 0 %}var(--verde-escuro){% else %}var(--texto){% endif %};">
+                    {% if p.gmd_lote != None %}{{ "%.2f"|format(p.gmd_lote) }} kg/dia{% else %}---{% endif %}
+                </td>
+                <td style="color: {% if p.gmd_cabeca and p.gmd_cabeca > 0 %}var(--verde-escuro){% else %}var(--texto){% endif %}; font-weight: bold;">
+                    {% if p.gmd_cabeca != None %}{{ "%.3f"|format(p.gmd_cabeca) }} kg/dia{% else %}---{% endif %}
+                </td>
+
                 <td>
-                    <div class="grupo-botoes-tabela">
-                        <a href="{{ url_for('editar_pesagem', id=p.id) }}" class="btn-tabela-secundario">Editar</a>
-                        <form action="{{ url_for('excluir_pesagem', id=p.id) }}" method="POST" class="form-excluir" onsubmit="return confirm('Deseja realmente excluir esta pesagem?');">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                            <button type="submit" class="btn-tabela-excluir">Excluir</button>
-                        </form>
-                    </div>
+                    <a href="{{ url_for('editar_pesagem', id=p.id) }}" class="btn-tabela-secundario">Editar</a>
+                    <form action="{{ url_for('excluir_pesagem', id=p.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apagar este registro?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <button type="submit" class="btn-tabela-excluir">Excluir</button>
+                    </form>
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" style="text-align: center;">Nenhuma pesagem registrada ainda.</td>
+                <td colspan="6" style="text-align: center; color: var(--texto-suave); padding: 24px;">Nenhum peso registrado para este lote.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
-
-<a class="voltar" href="{{ url_for('index') }}">← Voltar para a página inicial</a>
+{% endif %}
 {% endblock %}

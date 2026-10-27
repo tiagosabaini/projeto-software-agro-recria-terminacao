@@ -57,55 +57,57 @@
 </div>
 
 {% if lote_selecionado %}
-    <div style="max-width: 850px; margin: 0 auto; width: 100%;">
-        <h3 style="text-align: center; margin-bottom: 20px;">Histórico de Desempenho (Gramas/Dia)</h3>
-        <div style="background-color: var(--branco); border: 1.5px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra-suave); overflow: hidden;">
-            <div style="overflow-x: auto;">
-                <table style="margin: 0; box-shadow: none; border-radius: 0;">
-                    <thead>
-                        <tr style="background-color: #F4F6F4;">
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Data do Registro</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px;">Detalhes do Trato</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px; text-align: center;">Consumo Diário</th>
-                            <th style="color: var(--verde-escuro); padding: 14px 20px; text-align: center;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in historico_consumo %}
-                        <tr>
-                            <td style="padding: 14px 20px; font-weight: 600; color: var(--texto-suave);">
-                                {{ item.data_registro[:10] | data_br }}
-                            </td>
-                            <td style="padding: 14px 20px; color: var(--texto-suave); font-size: 0.95rem;">
-                                {{ item.qtd_sacos }} saco(s) de {{ item.peso_saco_kg }}kg para {{ item.qtd_bois }} cabeças (Duração: {{ item.dias }} dias).
-                            </td>
-                            <td style="padding: 14px 20px; text-align: center;">
-                                <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 12px; background-color: #E3F1E5; color: var(--verde-escuro); font-weight: 700; font-size: 1.1rem;">
-                                    {{ "%.0f"|format(item.gramas_cab_dia) }} g/cab/dia
-                                </div>
-                            </td>
-                            <td style="padding: 14px 20px; text-align: center;">
-                                <div class="grupo-botoes-tabela" style="justify-content: center;">
-                                    <a href="{{ url_for('editar_consumo', id=item.id) }}" class="btn-tabela-secundario">Editar</a>
-                                    <form action="{{ url_for('excluir_consumo', id=item.id) }}" method="POST" class="form-excluir" onsubmit="return confirm('Deseja realmente excluir este registro de consumo?');">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                                        <button type="submit" class="btn-tabela-excluir">Excluir</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 30px; color: var(--texto-suave);">
-                                Nenhum registro de consumo para este lote ainda.
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<!-- Histórico de Desempenho (Consumo) -->
+<div style="max-width: 850px; margin: 0 auto; width: 100%;">
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 16px;">
+        <h3 style="color: var(--verde-escuro);">Histórico de Consumo do Lote</h3>
     </div>
+
+    <div class="tabela-container">
+        <table class="tabela-dados">
+            <thead>
+                <tr>
+                    <th>Detalhes do Trato (Sacos e Cabeças)</th>
+                    <th>Período no Cocho</th>
+                    <th>Consumo Realizado</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in historico_consumo %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--texto); font-size: 1.05rem;">{{ "%.1f"|format(item.qtd_sacos) }} saco(s) de {{ "%.1f"|format(item.peso_saco_kg) }} kg</strong><br>
+                        <span style="color: var(--texto-suave); font-size: 0.95rem;">Distribuído para {{ item.qtd_bois }} cabeças</span>
+                    </td>
+                    
+                    <td style="color: var(--texto-suave); font-weight: 500;">
+                        Duração: {{ item.dias }} dias
+                    </td>
+                    
+                    <td>
+                        <span style="background-color: #E3F1E5; color: var(--verde-escuro); padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 1.05rem; display: inline-block; border: 1px solid #c3e0cb;">
+                            {{ "%.0f"|format(item.gramas_cab_dia) }} gramas / cabeça / dia
+                        </span>
+                    </td>
+                    
+                    <td>
+                        <a href="{{ url_for('editar_consumo', id=item.id) }}" class="btn-tabela-secundario">Editar</a>
+                        <form action="{{ url_for('excluir_consumo', id=item.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Apagar este registro?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="btn-tabela-excluir">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--texto-suave); padding: 24px;">Nenhum histórico de trato registrado para este lote.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endif %}
 
 <div style="text-align: center; margin-top: 40px;">

@@ -135,7 +135,14 @@
             <div class="despesa-info">
                 <span class="despesa-categoria">{{ despesa.categoria }}</span>
                 <strong class="despesa-lote">Lote: {{ despesa.identificacao }}</strong>
-                <p class="despesa-detalhes">{{ despesa.observacao or 'Sem observações adicionais.' }}</p>
+               <p class="despesa-detalhes" style="color: var(--texto-suave); font-size: 0.95rem; margin-top: 8px; margin-bottom: 0;">
+                {{ despesa.observacao or 'Sem observações adicionais.' }}
+                {% if despesa.qtd_cabecas and despesa.qtd_cabecas > 0 %}
+                    <br><span style="display: inline-block; margin-top: 6px; padding: 3px 8px; background-color: #E3F1E5; color: var(--verde-escuro); border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+                        Rateio: R$ {{ "%.2f"|format(despesa.valor / despesa.qtd_cabecas) }}/cab ({{ despesa.qtd_cabecas }} animais)
+                    </span>
+                {% endif %}
+            </p>
             </div>
             
             <div class="despesa-acao">
